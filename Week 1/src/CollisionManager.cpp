@@ -9,8 +9,8 @@ int CollisionManager::squaredDistance(const glm::vec2 p1, const glm::vec2 p2)
 	const int diffOfXs = p2.x - p1.x;
 	const int diffOfYs = p2.y - p1.y;
 	const auto result = diffOfXs * diffOfXs + diffOfYs * diffOfYs;
-
-	return result;
+	const auto result2 = sqrt(result);
+	return result2;
 }
 
 bool CollisionManager::squaredRadiusCheck(GameObject* object1, GameObject* object2)
