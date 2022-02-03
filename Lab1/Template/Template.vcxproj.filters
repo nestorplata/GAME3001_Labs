@@ -135,9 +135,6 @@
     <ClCompile Include="..\include\IMGUI_SDL\imgui_sdl.cpp">
       <Filter>IMGUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Lab2\src\StarShip.cpp">
-      <Filter>Game Objects</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\StartScene.h">
@@ -280,9 +277,6 @@
     </ClInclude>
     <ClInclude Include="..\include\IMGUI_SDL\imgui_sdl.h">
       <Filter>IMGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Lab2\src\StarShip.h">
-      <Filter>Game Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

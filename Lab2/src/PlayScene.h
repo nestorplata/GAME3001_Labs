@@ -6,7 +6,7 @@
 //#include "Plane.h"
 //#include "Player.h"
 #include "Target.h"
-#include "StarShip.h"
+#include "SpaceShip.h"
 #include "Button.h"
 #include "Label.h"
 
@@ -32,13 +32,13 @@ private:
 	//Plane* m_pPlaneSprite;
 	//Player* m_pPlayer;
 	Target* m_pTarget;
-	StarShip* m_pStarShip;
-	bool m_playerFacingRight;
+	SpaceShip* m_pSpaceShip;
+	//bool m_playerFacingRight;
 
 	// UI Items
-	Button* m_pBackButton;
-	Button* m_pNextButton;
-	Label* m_pInstructionsLabel;
+	//Button* m_pBackButton;
+	//Button* m_pNextButton;
+	//Label* m_pInstructionsLabel;
 };
 
 #endif /* defined (__PLAY_SCENE__) */

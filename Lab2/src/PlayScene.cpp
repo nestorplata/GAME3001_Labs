@@ -126,13 +126,14 @@ void PlayScene::start()
 
 	//Target Sprie
 	m_pTarget = new Target();
-	m_pTarget->getTransform()->position = glm::vec2(300.0f, 300.0f);
+	m_pTarget->getTransform()->position = glm::vec2(200.0f, 200.0f);
 	addChild(m_pTarget);
 
 	//Star_Ship
-	m_pStarShip = new StarShip();
-	m_pStarShip->getTransform()->position = glm::vec2(500.0f, 500.0f);
-	addChild(m_pStarShip);
+	m_pSpaceShip = new SpaceShip();
+	//m_pSpaceShip->getTransform()->position = glm::vec2(300.0f, 300.0f);
+	m_pSpaceShip->setCurrentHeading(0.0f);
+	addChild(m_pSpaceShip);
 
 	// Back Button
 	//m_pBackButton = new Button("../Assets/textures/backButton.png", "backButton", BACK_BUTTON);

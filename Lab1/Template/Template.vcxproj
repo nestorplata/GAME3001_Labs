@@ -156,7 +156,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Lab2\src\StarShip.cpp" />
     <ClCompile Include="..\include\IMGUI\imgui.cpp" />
     <ClCompile Include="..\include\IMGUI\imgui_demo.cpp" />
     <ClCompile Include="..\include\IMGUI\imgui_draw.cpp" />
@@ -193,7 +192,6 @@
     <ClCompile Include="..\src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Lab2\src\StarShip.h" />
     <ClInclude Include="..\include\IMGUI\imconfig.h" />
     <ClInclude Include="..\include\IMGUI\imgui.h" />
     <ClInclude Include="..\include\IMGUI\imgui_internal.h" />
