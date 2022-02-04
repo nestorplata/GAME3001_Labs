@@ -15,9 +15,9 @@ SpaceShip::SpaceShip()
 	getRigidBody()->isColliding = false;
 	setType(AGENT);
 
-	m_maxSpeed = 0.0f;
+	m_maxSpeed = 1.0f;
 	m_turnRate = 5.0f;
-	m_accelerationRate = 0.0f;
+	m_accelerationRate = 1.0f;
 
 
 }
@@ -99,9 +99,8 @@ void SpaceShip::m_move()
 
 	const glm::vec2 initial_position = getTransform()->position;
 
-	getRigidBody()->velocity = getCurrentDirection() * getMaxSpeed();
-
-	getRigidBody()->acceleration = getCurrentDirection() * getAccelerationRate();
+	//auto velocity_plus_acceleration = getRigidBody()->velocity + getRigidBody()->acceleration;
+	//std::cout << "Combined :(" << velocity_plus_acceleration.x << ", " << velocity_plus_acceleration.y << ")"<< std::endl;
 
 	const glm::vec2 velocity_term = getRigidBody()->velocity * dt;
 	
@@ -110,7 +109,13 @@ void SpaceShip::m_move()
 	glm::vec2 final_position = initial_position + velocity_term + acceleration_term;
 
 	getTransform()->position = final_position;
-	std::cout << getRigidBody()->velocity.x;
+
+	getRigidBody()->velocity += getRigidBody()->acceleration;
+
+
+	std::cout << "Velocity: (" << getRigidBody()->velocity.x << ", " << getRigidBody()->velocity.y << ")" << std::endl;
+	std::cout << "Acceleration: (" << getRigidBody()->acceleration.x << ", " << getRigidBody()->acceleration.y << ")" << std::endl;
+
 }
 
 

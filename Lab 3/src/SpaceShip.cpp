@@ -22,7 +22,7 @@ SpaceShip::SpaceShip()
 	m_turnRate = 5.0f; // a maximum number of degrees to turn each time-step
 	m_accelerationRate = 4.0f; // a maximum number of pixels to add to the velocity each frame
 	
-	Agent::updateWhiskers(90);
+	Agent::updateWhiskers(0);
 
 	setType(AGENT);
 }
@@ -105,8 +105,16 @@ void SpaceShip::LookWhereYoureGoing(const glm::vec2 target_direction)
 {
 	const float target_rotation = Util::signedAngle(getCurrentDirection(), target_direction) - 90;
 
-	//const float turn_sensitivity = 3.0f;
+	const float turn_sensitivity = 3.0f;
 
+	if (getCollisionWhiskers()[0])
+	{
+		target_ratation += getTurnRate() * turn_sesivity;
+	}
+	else if (getCollisionWhiskers()[2])
+	{
+		target_rotation -= getTurnRate()
+	}
 	setCurrentHeading(Util::lerpUnclamped(getCurrentHeading(),
 		getCurrentHeading() + target_rotation, getTurnRate() * TheGame::Instance().getDeltaTime()));
 }

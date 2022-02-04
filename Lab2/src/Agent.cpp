@@ -77,5 +77,4 @@ void Agent::m_changeDirection()
 	const auto y = sin(m_currentHeading * Util::Deg2Rad);
 	m_currentDirection = glm::vec2(x, y);
 
-	std::cout << "Current Direction: (" << m_currentDirection.x << ", " << m_currentDirection.y << ")" << std::endl;
 }

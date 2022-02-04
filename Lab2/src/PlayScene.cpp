@@ -114,15 +114,6 @@ void PlayScene::start()
 {
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
-	
-	// Plane Sprite
-	//m_pPlaneSprite = new Plane();
-	//addChild(m_pPlaneSprite);
-
-	// Player Sprite
-	//m_pPlayer = new Player();
-	//addChild(m_pPlayer);
-	//m_playerFacingRight = true;
 
 	//Target Sprie
 	m_pTarget = new Target();
@@ -133,6 +124,9 @@ void PlayScene::start()
 	m_pSpaceShip = new SpaceShip();
 	//m_pSpaceShip->getTransform()->position = glm::vec2(300.0f, 300.0f);
 	m_pSpaceShip->setCurrentHeading(0.0f);
+	m_pSpaceShip->getRigidBody()->velocity = m_pSpaceShip->getCurrentDirection() * m_pSpaceShip->getMaxSpeed();
+	m_pSpaceShip->getRigidBody()->acceleration = m_pSpaceShip->getCurrentDirection() * m_pSpaceShip->getAccelerationRate();
+
 	addChild(m_pSpaceShip);
 
 	// Back Button
