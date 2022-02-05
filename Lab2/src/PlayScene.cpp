@@ -19,12 +19,26 @@ PlayScene::~PlayScene()
 void PlayScene::draw()
 {
 	drawDisplayList();
+
+	if (m_bDebugView)
+	{
+		Util::DrawCircle(m_pTarget->getTransform()->position, m_pTarget->getWidth() * 0.5f);
+
+		if (m_pSpaceShip->isEnabled())
+		{
+			Util::DrawCircle(m_pSpaceShip->getTransform()->position, Util::max(m_pSpaceShip->getWidth() * 0.5f, m_pSpaceShip->getHeight() * 0.5f));
+
+		}
+	}
+
 	SDL_SetRenderDrawColor(Renderer::Instance().getRenderer(), 255, 255, 255, 255);
 }
 
 void PlayScene::update()
 {
 	updateDisplayList();
+
+	CollisionManager::squaredRadiusCheck(m_pSpaceShip, m_pTarget);
 }
 
 void PlayScene::clean()
@@ -114,6 +128,7 @@ void PlayScene::start()
 {
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
+	m_bDebugView = false;
 
 	//Target Sprie
 	m_pTarget = new Target();
@@ -181,7 +196,7 @@ void PlayScene::start()
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
 
-void PlayScene::GUI_Function() const
+void PlayScene::GUI_Function()
 {
 	// Always open with a NewFrame
 	ImGui::NewFrame();
@@ -191,10 +206,13 @@ void PlayScene::GUI_Function() const
 	
 	ImGui::Begin("Target Movement", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
 
-	//if(ImGui::Button("My Button"))
-	//{
-	//	std::cout << "My Button Pressed" << std::endl;
-	//}
+	ImGui::Separator();
+
+	static bool toggleDebug = false;
+	if (ImGui::Checkbox("Toggle Debug", &toggleDebug))
+	{
+		m_bDebugView = toggleDebug;
+	}
 
 	ImGui::Separator();
 
@@ -239,10 +257,10 @@ void PlayScene::GUI_Function() const
 	if (ImGui::Button("Reset"))
 	{
 		//reset ship's position
-		m_pSpaceShip->getTransform()->position = glm::vec2 (50.0, 50.0);
+		m_pSpaceShip->getTransform()->position = glm::vec2 (100.0, 100.0);
 
 		//Reset target's position
-		m_pTarget->getTransform()->position = glm::vec2(500.0, 500.0);
+		m_pTarget->getTransform()->position = glm::vec2(300.0, 300.0);
 
 
 		m_pSpaceShip->setCurrentHeading(0.0f);

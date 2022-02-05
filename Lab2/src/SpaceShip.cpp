@@ -117,6 +117,9 @@ void SpaceShip::lookWhereYourGoing(glm::vec2 target_direction)
 			setCurrentHeading(getCurrentHeading() - getTurnRate());
 		}
 	}
+
+	const auto size = TextureManager::Instance().getTextureSize("space");
+	//std::cout << "Sixe( width: " << size.x << ", height: " << size.y << " )" << std::endl;
 }
 
 void SpaceShip::m_move()
