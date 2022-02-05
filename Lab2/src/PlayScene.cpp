@@ -117,16 +117,17 @@ void PlayScene::start()
 
 	//Target Sprie
 	m_pTarget = new Target();
-	m_pTarget->getTransform()->position = glm::vec2(200.0f, 200.0f);
+	m_pTarget->getTransform()->position = glm::vec2(500.0f, 500.0f);
 	addChild(m_pTarget);
 
 	//Star_Ship
 	m_pSpaceShip = new SpaceShip();
-	//m_pSpaceShip->getTransform()->position = glm::vec2(300.0f, 300.0f);
+	m_pSpaceShip->getTransform()->position = glm::vec2(100.0f, 100.0f);
+
 	m_pSpaceShip->setCurrentHeading(0.0f);
 	m_pSpaceShip->setTargetPosition(m_pTarget->getTransform()->position);
-	m_pSpaceShip->getRigidBody()->velocity = m_pSpaceShip->getCurrentDirection() * m_pSpaceShip->getMaxSpeed();
-	m_pSpaceShip->getRigidBody()->acceleration = m_pSpaceShip->getCurrentDirection() * m_pSpaceShip->getAccelerationRate();
+	m_pSpaceShip->getRigidBody()->acceleration = m_pSpaceShip->getCurrentDirection() * 
+		m_pSpaceShip->getAccelerationRate();
 	m_pSpaceShip->setEnabled(false);
 	addChild(m_pSpaceShip);
 
@@ -204,6 +205,7 @@ void PlayScene::GUI_Function() const
 		m_pSpaceShip->setTargetPosition(m_pTarget->getTransform()->position);
 	}
 	ImGui::Separator();
+
 	 //Spaceshp properties
 	static bool toggleSeek = m_pSpaceShip->isEnabled();
 	if (ImGui::Checkbox("Toggle Seek", &toggleSeek))
@@ -215,7 +217,7 @@ void PlayScene::GUI_Function() const
 	if (ImGui::SliderFloat("Max Speed", &speed, 0.0f, 100.0f))
 	{
 		m_pSpaceShip->setMaxSpeed(speed);
-		m_pSpaceShip->getRigidBody()->velocity = m_pSpaceShip->getCurrentDirection() * m_pSpaceShip->getMaxSpeed();
+		//m_pSpaceShip->getRigidBody()->velocity = m_pSpaceShip->getCurrentDirection() * m_pSpaceShip->getMaxSpeed();
 
 	}
 
@@ -232,6 +234,24 @@ void PlayScene::GUI_Function() const
 	{
 		m_pSpaceShip->setTurnRate(turn_rate);
 
+	}
+
+	if (ImGui::Button("Reset"))
+	{
+		//reset ship's position
+		m_pSpaceShip->getTransform()->position = glm::vec2 (50.0, 50.0);
+
+		//Reset target's position
+		m_pTarget->getTransform()->position = glm::vec2(500.0, 500.0);
+
+
+		m_pSpaceShip->setCurrentHeading(0.0f);
+		m_pSpaceShip->setTargetPosition(m_pTarget->getTransform()->position);
+		m_pSpaceShip->getRigidBody()->velocity = glm::vec2(0.0, 0.0);
+		m_pSpaceShip->getRigidBody()->acceleration = m_pSpaceShip->getCurrentDirection() *
+			m_pSpaceShip->getAccelerationRate();
+
+		m_pSpaceShip->setTargetPosition(m_pTarget->getTransform()->position);
 	}
 
 	ImGui::End();

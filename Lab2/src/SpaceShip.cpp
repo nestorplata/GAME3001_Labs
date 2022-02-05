@@ -9,13 +9,13 @@ SpaceShip::SpaceShip()
 	const auto size = TextureManager::Instance().getTextureSize("space");
 	setWidth(size.x);
 	setHeight(size.y);
-	getTransform()->position = glm::vec2(300.0f, 300.0f);
+	getTransform()->position = glm::vec2(500.0f, 500.0f);
 	getRigidBody()->velocity = glm::vec2(0.0f, 0.0f);
 	getRigidBody()->acceleration = glm::vec2(0.0f, 0.0f);
 	getRigidBody()->isColliding = false;
 	setType(AGENT);
 
-	m_maxSpeed = 1.0f;
+	m_maxSpeed = 5.0f;
 	m_turnRate = 5.0f;
 	m_accelerationRate = 1.0f;
 
@@ -87,6 +87,17 @@ void SpaceShip::setDesiredVelocity(const glm::vec2 target_position)
 
 void SpaceShip::Seek()
 {
+	setDesiredVelocity(getTargetPosition());
+	//setCurrentDirection(getDesiredVelocity());
+
+	//auto target_direction = getTargetPosition() - getTransform()->position;
+
+	const glm::vec2 steering_direction = getDesiredVelocity() - getCurrentDirection();
+
+	setCurrentDirection(steering_direction);
+
+	getRigidBody()->acceleration =getCurrentDirection() *getAccelerationRate();
+
 }
 
 void SpaceShip::lookWhereYourGoing()
@@ -95,26 +106,27 @@ void SpaceShip::lookWhereYourGoing()
 
 void SpaceShip::m_move()
 {
+	Seek();
+
 	const float dt = TheGame::Instance().getDeltaTime();
 
 	const glm::vec2 initial_position = getTransform()->position;
 
-	//auto velocity_plus_acceleration = getRigidBody()->velocity + getRigidBody()->acceleration;
-	//std::cout << "Combined :(" << velocity_plus_acceleration.x << ", " << velocity_plus_acceleration.y << ")"<< std::endl;
-
-	const glm::vec2 velocity_term = getRigidBody()->velocity * dt;
+	//const glm::vec2 velocity_term = (getRigidBody()->velocity + getCurrentDirection() * getMaxSpeed()) * 0.5f* dt;
+	const glm::vec2 velocity_term = getRigidBody()->velocity;
 	
-	const glm::vec2 acceleration_term = getRigidBody()->acceleration * 0.5f * dt * dt;
+	//const glm::vec2 acceleration_term = (getRigidBody()->acceleration + getCurrentDirection()* getAccelerationRate())* 0.5f * dt * dt;
+	const glm::vec2 acceleration_term = getRigidBody()->acceleration * 0.5f * dt;
 
 	glm::vec2 final_position = initial_position + velocity_term + acceleration_term;
 
 	getTransform()->position = final_position;
 
+	//add our acceleration to velocity
 	getRigidBody()->velocity += getRigidBody()->acceleration;
 
-
-	std::cout << "Velocity: (" << getRigidBody()->velocity.x << ", " << getRigidBody()->velocity.y << ")" << std::endl;
-	std::cout << "Acceleration: (" << getRigidBody()->acceleration.x << ", " << getRigidBody()->acceleration.y << ")" << std::endl;
+	//clamp our velocity at max speed;
+	getRigidBody()->velocity = Util::clamp(getRigidBody()->velocity, getMaxSpeed());
 
 }
 
