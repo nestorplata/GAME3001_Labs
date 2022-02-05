@@ -117,7 +117,7 @@ void PlayScene::start()
 
 	//Target Sprie
 	m_pTarget = new Target();
-	m_pTarget->getTransform()->position = glm::vec2(500.0f, 500.0f);
+	m_pTarget->getTransform()->position = glm::vec2(300.0f, 300.0f);
 	addChild(m_pTarget);
 
 	//Star_Ship

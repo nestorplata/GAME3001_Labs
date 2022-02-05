@@ -27,7 +27,7 @@ public:
 	void setDesiredVelocity(glm::vec2 target_position);
 
 	void Seek();
-	void lookWhereYourGoing();
+	void lookWhereYourGoing(glm::vec2 target_direction);
 
 
 private:

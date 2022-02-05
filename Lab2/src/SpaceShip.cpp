@@ -32,7 +32,7 @@ void SpaceShip::draw()
 	const auto y = getTransform()->position.y;
 
 	// draw the SpaceShip
-	TextureManager::Instance().draw("space", x, y, 0, 255, true);
+	TextureManager::Instance().draw("space", x, y, getCurrentHeading(), 255, true);
 
 }
 
@@ -94,14 +94,29 @@ void SpaceShip::Seek()
 
 	const glm::vec2 steering_direction = getDesiredVelocity() - getCurrentDirection();
 
-	setCurrentDirection(steering_direction);
+	lookWhereYourGoing(steering_direction);
 
 	getRigidBody()->acceleration =getCurrentDirection() *getAccelerationRate();
 
 }
 
-void SpaceShip::lookWhereYourGoing()
+void SpaceShip::lookWhereYourGoing(glm::vec2 target_direction)
 {
+	float target_rotation = Util::signedAngle(getCurrentDirection(), target_direction);
+
+	float turn_sensitiviy = 5.0f;
+
+	if (abs(target_rotation) > turn_sensitiviy)
+	{
+		if (target_rotation > 0.0f)
+		{
+			setCurrentHeading(getCurrentHeading() + getTurnRate());
+		}
+		else if (target_rotation < 0.0f)
+		{
+			setCurrentHeading(getCurrentHeading() - getTurnRate());
+		}
+	}
 }
 
 void SpaceShip::m_move()
@@ -113,10 +128,10 @@ void SpaceShip::m_move()
 	const glm::vec2 initial_position = getTransform()->position;
 
 	//const glm::vec2 velocity_term = (getRigidBody()->velocity + getCurrentDirection() * getMaxSpeed()) * 0.5f* dt;
-	const glm::vec2 velocity_term = getRigidBody()->velocity;
+	const glm::vec2 velocity_term = getRigidBody()->velocity* dt;
 	
 	//const glm::vec2 acceleration_term = (getRigidBody()->acceleration + getCurrentDirection()* getAccelerationRate())* 0.5f * dt * dt;
-	const glm::vec2 acceleration_term = getRigidBody()->acceleration * 0.5f * dt;
+	const glm::vec2 acceleration_term = getRigidBody()->acceleration * 0.5f;
 
 	glm::vec2 final_position = initial_position + velocity_term + acceleration_term;
 
