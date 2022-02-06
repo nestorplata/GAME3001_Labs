@@ -22,16 +22,28 @@ void PlayScene::draw()
 
 	if(m_bDebugView)
 	{
+		//Draw a circle around the target
 		Util::DrawCircle(m_pTarget->getTransform()->position, m_pTarget->getWidth() * 0.5f);
+		//draw Obstacle bounding box
 		Util::DrawRect(m_pObstacle->getTransform()->position - glm::vec2(m_pObstacle->getWidth() * 0.5f, m_pObstacle->getHeight() * 0.5f), m_pObstacle->getWidth(), m_pObstacle->getHeight());
 
 		
 		if (m_pSpaceShip->isEnabled())
 		{
-			//Util::DrawCircle(m_pSpaceShip->getTransform()->position, Util::max(m_pSpaceShip->getWidth() * 0.5f, m_pSpaceShip->getHeight() * 0.5f));
+			//Draw SpaceSHip Bounding box
 			Util::DrawRect(m_pSpaceShip->getTransform()->position - glm::vec2(m_pSpaceShip->getWidth() * 0.5f, m_pSpaceShip->getHeight() * 0.5f), m_pSpaceShip->getWidth(), m_pSpaceShip->getHeight());
 		
-			//Util::DrawLine(m_pSpaceShip->getTransform()->position, m_pSpaceShip->getLeftLOSEndPoint(), m_pSpaceShip->getLineColour());
+			Util::DrawLine(m_pSpaceShip->getTransform()->position,
+				m_pSpaceShip->getLeftLOSEndPoint(),
+				m_pSpaceShip->getLineColour(0));
+
+			Util::DrawLine(m_pSpaceShip->getTransform()->position,
+				m_pSpaceShip->getMiddleLOSEndPoint(),
+				m_pSpaceShip->getLineColour(1));
+
+			Util::DrawLine(m_pSpaceShip->getTransform()->position,
+				m_pSpaceShip->getRightLOSEndPoint(),
+				m_pSpaceShip->getLineColour(2));
 
 		}
 
@@ -49,6 +61,27 @@ void PlayScene::update()
 		CollisionManager::circleAABBCheck(m_pTarget, m_pSpaceShip);
 		CollisionManager::AABBCheck(m_pSpaceShip, m_pObstacle);
 		CollisionManager::rotateAABB(m_pSpaceShip, m_pSpaceShip->getCurrentHeading());
+		
+		//Obstacle dimension information
+		const auto boxWidth = m_pObstacle->getWidth();
+		const int halfBoxWidth = boxWidth * 0.5f;
+		const auto boxHeight = m_pObstacle->getHeight();
+		const int halfBoxHeight = boxHeight * 0.5f;
+		const auto boxStart = m_pObstacle->getTransform()->position - glm::vec2(halfBoxWidth, halfBoxHeight);
+
+		// check every whisker to see if it is colliding with the Obstacle
+		m_pSpaceShip->getCollisionWhiskers()[0] = CollisionManager::lineRectCheck(m_pSpaceShip->getTransform()->position,
+			m_pSpaceShip->getLeftLOSEndPoint(), boxStart, boxWidth, boxHeight);
+		m_pSpaceShip->getCollisionWhiskers()[1] = CollisionManager::lineRectCheck(m_pSpaceShip->getTransform()->position,
+			m_pSpaceShip->getMiddleLOSEndPoint(), boxStart, boxWidth, boxHeight);
+		m_pSpaceShip->getCollisionWhiskers()[2] = CollisionManager::lineRectCheck(m_pSpaceShip->getTransform()->position,
+			m_pSpaceShip->getRightLOSEndPoint(), boxStart, boxWidth, boxHeight);
+
+		for (int i = 0; i < 3; ++i)
+		{
+			m_pSpaceShip->setLineColour(i,
+				(m_pSpaceShip->getCollisionWhiskers()[i]) ? glm::vec4(1, 0, 0, 1) : glm::vec4(0, 1, 0, 1));
+		}
 	}
 }
 
@@ -167,6 +200,13 @@ void PlayScene::GUI_Function()
 	if (ImGui::SliderFloat("Turn Rate", &turn_rate, 0.0f, 20.0f))
 	{
 		m_pSpaceShip->setTurnRate(turn_rate);
+	}
+
+	//Whisker properties
+	static float whisker_angle = m_pSpaceShip->getWhiskerAngle();
+	if (ImGui::SliderFloat("Whisker Angle", &whisker_angle, 10.0f, 60.0f))
+	{
+		m_pSpaceShip->updateWhiskers(whisker_angle);
 	}
 
 	if(ImGui::Button("Reset"))

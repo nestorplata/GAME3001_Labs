@@ -57,12 +57,12 @@ glm::vec2 Agent::getLeftLOSEndPoint() const
 	return m_leftLOSEndPoint;
 }
 
-glm::vec2 Agent::getMiddleLosEndPoint() const
+glm::vec2 Agent::getMiddleLOSEndPoint() const
 {
 	return m_middleLOSEndPoint;
 }
 
-glm::vec2 Agent::getRightLOSEEndPoint() const
+glm::vec2 Agent::getRightLOSEndPoint() const
 {
 	return m_rightLOSEendPoint;
 }
@@ -77,7 +77,7 @@ glm::vec4 Agent::getLineColour(int index)
 	return m_lineColour[index];
 }
 
-float Agent::getWhiskersAngle()
+float Agent::getWhiskerAngle()
 {
 	return m_whiskersangles;
 }
@@ -134,7 +134,7 @@ void Agent::setLineColour(int index, glm::vec4 colour)
 	m_lineColour[index] = colour;
 }
 
-void Agent::setWhiskersAngle(float angle)
+void Agent::setWhiskerAngle(float angle)
 {
 	m_whiskersangles = angle;
 }

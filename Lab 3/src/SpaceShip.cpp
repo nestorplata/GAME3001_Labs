@@ -22,7 +22,7 @@ SpaceShip::SpaceShip()
 	m_turnRate = 5.0f; // a maximum number of degrees to turn each time-step
 	m_accelerationRate = 4.0f; // a maximum number of pixels to add to the velocity each frame
 	
-	Agent::updateWhiskers(0);
+	Agent::updateWhiskers(45.0f);
 
 	setType(AGENT);
 }
@@ -120,7 +120,7 @@ void SpaceShip::LookWhereYoureGoing(const glm::vec2 target_direction)
 		getCurrentHeading() + target_rotation, 
 		getTurnRate() * TheGame::Instance().getDeltaTime()));
 
-	updateWhiskers(getWhiskersAngle());
+	updateWhiskers(getWhiskerAngle());
 }
 
 void SpaceShip::m_move()
