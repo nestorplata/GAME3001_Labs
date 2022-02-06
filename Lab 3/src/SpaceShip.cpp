@@ -103,7 +103,8 @@ void SpaceShip::Seek()
 
 void SpaceShip::LookWhereYoureGoing(const glm::vec2 target_direction)
 {
-	float target_rotation = Util::signedAngle(getCurrentDirection(), target_direction) - 90;
+	float target_rotation = Util::signedAngle(getCurrentDirection(),
+		target_direction) - 90;
 
 	float turn_sensitivity = 3.0f;
 
@@ -116,7 +117,10 @@ void SpaceShip::LookWhereYoureGoing(const glm::vec2 target_direction)
 		target_rotation -= getTurnRate() * turn_sensitivity;
 	}
 	setCurrentHeading(Util::lerpUnclamped(getCurrentHeading(),
-		getCurrentHeading() + target_rotation, getTurnRate() * TheGame::Instance().getDeltaTime()));
+		getCurrentHeading() + target_rotation, 
+		getTurnRate() * TheGame::Instance().getDeltaTime()));
+
+	updateWhiskers(getWhiskersAngle());
 }
 
 void SpaceShip::m_move()
