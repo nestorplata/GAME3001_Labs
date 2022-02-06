@@ -15,6 +15,8 @@ Agent::Agent()
 	m_collisionWhiskers[0] = false;
 
 	m_whiskersangles = 45;
+
+	m_LOSDistance = 300;
 }
 
 Agent::~Agent()
@@ -142,8 +144,8 @@ void Agent::updateWhiskers(float angle)
 	m_whiskersangles = angle;
 	setMiddleLOSEndPoint(getTransform()->position + getCurrentDirection() * getLOSDistance());
 
-	float x = sin((getCurrentHeading() + m_whiskersangles + 90) * Util::Deg2Rad);
-	float y = cos((getCurrentHeading() + m_whiskersangles + 90) * Util::Deg2Rad);
+	float x = sin((getCurrentHeading() - m_whiskersangles + 90) * Util::Deg2Rad);
+	float y = cos((getCurrentHeading() - m_whiskersangles + 90) * Util::Deg2Rad);
 	setLeftLOSEndPoint(getTransform()->position + glm::vec2(x, -y) * getLOSDistance() * 0.75f);
 
 	x = sin((getCurrentHeading() + m_whiskersangles + 90) * Util::Deg2Rad);
