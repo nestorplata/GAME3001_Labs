@@ -22,8 +22,8 @@ void PlayScene::draw()
 
 	if(m_bDebugView)
 	{
-		//Util::DrawRect(m_pTarget->getTransform()->position - glm::vec2(m_pTarget->getWidth() * 0.5f, m_pTarget->getHeight() * 0.5f), m_pTarget->getWidth(), m_pTarget->getHeight());
 		Util::DrawCircle(m_pTarget->getTransform()->position, m_pTarget->getWidth() * 0.5f);
+		Util::DrawRect(m_pObstacle->getTransform()->position - glm::vec2(m_pObstacle->getWidth() * 0.5f, m_pObstacle->getHeight() * 0.5f), m_pObstacle->getWidth(), m_pObstacle->getHeight());
 
 		
 		if (m_pSpaceShip->isEnabled())
@@ -31,10 +31,8 @@ void PlayScene::draw()
 			//Util::DrawCircle(m_pSpaceShip->getTransform()->position, Util::max(m_pSpaceShip->getWidth() * 0.5f, m_pSpaceShip->getHeight() * 0.5f));
 			Util::DrawRect(m_pSpaceShip->getTransform()->position - glm::vec2(m_pSpaceShip->getWidth() * 0.5f, m_pSpaceShip->getHeight() * 0.5f), m_pSpaceShip->getWidth(), m_pSpaceShip->getHeight());
 		
-			Util::DrawLine(m_pSpaceShip->getTransform()->position, m_pSpaceShip->getLeftLOSEndPoint(), m_pSpaceShip->getLineColour());
+			//Util::DrawLine(m_pSpaceShip->getTransform()->position, m_pSpaceShip->getLeftLOSEndPoint(), m_pSpaceShip->getLineColour());
 
-		
-		
 		}
 
 	}
@@ -48,9 +46,8 @@ void PlayScene::update()
 
 	if(m_pSpaceShip->isEnabled())
 	{
-		//CollisionManager::squaredRadiusCheck(m_pSpaceShip, m_pTarget);
 		CollisionManager::circleAABBCheck(m_pTarget, m_pSpaceShip);
-		//CollisionManager::AABBCheck(m_pTarget, m_pSpaceShip);
+		CollisionManager::AABBCheck(m_pSpaceShip, m_pObstacle);
 		CollisionManager::rotateAABB(m_pSpaceShip, m_pSpaceShip->getCurrentHeading());
 	}
 }
@@ -84,6 +81,7 @@ void PlayScene::start()
 {
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
+	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "thunder", SOUND_SFX);
 	m_bDebugView = false;
 
 	m_pTarget = new Target(); // instantiating a new Target object - allocating memory on the Heap
@@ -96,7 +94,10 @@ void PlayScene::start()
 	m_pSpaceShip->setEnabled(false);
 	addChild(m_pSpaceShip);
 
-	SoundManager::Instance().load("../Assets")
+	m_pObstacle = new Obstacle();
+	addChild(m_pObstacle);
+	SoundManager::Instance().load("../Assets/audio/yay.ogg", "yay", SOUND_SFX);
+
 
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
@@ -124,10 +125,20 @@ void PlayScene::GUI_Function()
 	// target properties
 	
 	static float position[2] = { m_pTarget->getTransform()->position.x, m_pTarget->getTransform()->position.y};
-	if(ImGui::SliderFloat2("Target Position", position, 0.0f, 800.0f))
+	if(ImGui::SliderFloat2("Target Position", position, 0.0f, 600.0f))
 	{
 		m_pTarget->getTransform()->position = glm::vec2(position[0], position[1]);
 		m_pSpaceShip->setTargetPosition(m_pTarget->getTransform()->position);
+	}
+
+	ImGui::Separator();
+
+	// Obstacle properties
+
+	static float obstacle[2] = { m_pObstacle->getTransform()->position.x, m_pObstacle->getTransform()->position.y };
+	if (ImGui::SliderFloat2("Obstacle Position", obstacle, 0.0f, 600.0f))
+	{
+		m_pObstacle->getTransform()->position = glm::vec2(obstacle[0], obstacle[1]);
 	}
 
 	ImGui::Separator();
