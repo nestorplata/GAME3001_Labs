@@ -60,7 +60,6 @@ private:
 	bool m_hasLOS;
 	glm::vec4 m_LOSColour;
 
-
 	glm::vec2 m_leftLOSEndPoint;
 	glm::vec2 m_middleLOSEndPoint;
 	glm::vec2 m_rightLOSEendPoint;
@@ -68,9 +67,6 @@ private:
 	bool m_collisionWhiskers[3];
 
 	float m_whiskersangles;
-
-
-
 };
 
 
