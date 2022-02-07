@@ -33,17 +33,25 @@ void PlayScene::draw()
 			//Draw SpaceSHip Bounding box
 			Util::DrawRect(m_pSpaceShip->getTransform()->position - glm::vec2(m_pSpaceShip->getWidth() * 0.5f, m_pSpaceShip->getHeight() * 0.5f), m_pSpaceShip->getWidth(), m_pSpaceShip->getHeight());
 		
-			Util::DrawLine(m_pSpaceShip->getTransform()->position,
-				m_pSpaceShip->getLeftLOSEndPoint(),
+			//left
+			Util::DrawLine(m_pSpaceShip->getTransform()->position, m_pSpaceShip->getLeftLOSEndPoint(),
 				m_pSpaceShip->getLineColour(0));
 
-			Util::DrawLine(m_pSpaceShip->getTransform()->position,
-				m_pSpaceShip->getMiddleLOSEndPoint(),
+			//MIddleLeft
+			Util::DrawLine(m_pSpaceShip->getTransform()->position, m_pSpaceShip->getMiddleLeftLOSEndPoint(),
 				m_pSpaceShip->getLineColour(1));
 
-			Util::DrawLine(m_pSpaceShip->getTransform()->position,
-				m_pSpaceShip->getRightLOSEndPoint(),
+			//middle
+			Util::DrawLine(m_pSpaceShip->getTransform()->position, m_pSpaceShip->getMiddleLOSEndPoint(),
 				m_pSpaceShip->getLineColour(2));
+
+			//MiddleRight
+			Util::DrawLine(m_pSpaceShip->getTransform()->position, m_pSpaceShip->getMiddleRightLOSEndPoint(),
+				m_pSpaceShip->getLineColour(3));
+
+			//RIght
+			Util::DrawLine(m_pSpaceShip->getTransform()->position, m_pSpaceShip->getRightLOSEndPoint(),
+				m_pSpaceShip->getLineColour(4));
 
 		}
 
@@ -72,12 +80,21 @@ void PlayScene::update()
 		// check every whisker to see if it is colliding with the Obstacle
 		m_pSpaceShip->getCollisionWhiskers()[0] = CollisionManager::lineRectCheck(m_pSpaceShip->getTransform()->position,
 			m_pSpaceShip->getLeftLOSEndPoint(), boxStart, boxWidth, boxHeight);
+
 		m_pSpaceShip->getCollisionWhiskers()[1] = CollisionManager::lineRectCheck(m_pSpaceShip->getTransform()->position,
-			m_pSpaceShip->getMiddleLOSEndPoint(), boxStart, boxWidth, boxHeight);
+			m_pSpaceShip->getMiddleLeftLOSEndPoint(), boxStart, boxWidth, boxHeight);
+
 		m_pSpaceShip->getCollisionWhiskers()[2] = CollisionManager::lineRectCheck(m_pSpaceShip->getTransform()->position,
+			m_pSpaceShip->getMiddleLOSEndPoint(), boxStart, boxWidth, boxHeight);
+
+		m_pSpaceShip->getCollisionWhiskers()[3] = CollisionManager::lineRectCheck(m_pSpaceShip->getTransform()->position,
+			m_pSpaceShip->getMiddleRightLOSEndPoint(), boxStart, boxWidth, boxHeight);
+
+		m_pSpaceShip->getCollisionWhiskers()[4] = CollisionManager::lineRectCheck(m_pSpaceShip->getTransform()->position,
 			m_pSpaceShip->getRightLOSEndPoint(), boxStart, boxWidth, boxHeight);
 
-		for (int i = 0; i < 3; ++i)
+
+		for (int i = 0; i < 5; ++i)
 		{
 			m_pSpaceShip->setLineColour(i,
 				(m_pSpaceShip->getCollisionWhiskers()[i]) ? glm::vec4(1, 0, 0, 1) : glm::vec4(0, 1, 0, 1));
@@ -214,7 +231,7 @@ void PlayScene::GUI_Function()
 		// reset ship's position
 		m_pSpaceShip->getTransform()->position = glm::vec2(100.0f, 400.0f);
 		// reset target's position
-		m_pTarget->getTransform()->position = glm::vec2(500.0f, 100.0f);
+		//m_pTarget->getTransform()->position = glm::vec2(500.0f, 100.0f);
 
 		// reset current heading (orientation), velocity and acceleration
 		m_pSpaceShip->setCurrentHeading(0.0);
