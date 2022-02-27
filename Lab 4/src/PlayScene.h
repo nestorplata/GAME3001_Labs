@@ -31,8 +31,17 @@ private:
 	Target* m_pTarget;
 	SpaceShip* m_pSpaceShip;
 
-	//test Tile
-	Tile* m_pTile;
+	//PathFinding Objects and Functions
+	std::vector<Tile*> m_pGrid;
+	bool m_isGridEnabled;
+
+	void m_buildGrid();
+	bool m_getGridEnabled() const;
+	void m_setGridEnabled(bool state);
+
+	// convinience functions to convert world to grid space
+	Tile* m_getTile(int col, int row);
+	Tile* m_getTile(glm::vec2 grid_position);
 	// Debug bool
 	bool m_bDebugView;
 };
