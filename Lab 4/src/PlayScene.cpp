@@ -57,9 +57,11 @@ void PlayScene::start()
 {
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
-	m_bDebugView = false;
 
 	m_buildGrid();
+
+	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
+
 
 	m_pTarget = new Target(); // instantiating a new Target object - allocating memory on the Heap
 	addChild(m_pTarget);
@@ -126,6 +128,7 @@ Tile* PlayScene::m_getTile(const glm::vec2 grid_position)
 
 void PlayScene::GUI_Function()
 {
+	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
 	// Always open with a NewFrame
 	ImGui::NewFrame();
 
@@ -136,10 +139,11 @@ void PlayScene::GUI_Function()
 
 	ImGui::Separator();
 
-	static bool toggleDebug = false;
-	if (ImGui::Checkbox("Toggle Debug", &toggleDebug))
+	static bool toggleGrid = false;
+	if (ImGui::Checkbox("Toggle Grid", &toggleGrid))
 	{
-		m_bDebugView = toggleDebug;
+		m_isGridEnabled = toggleGrid;
+		m_setGridEnabled(m_isGridEnabled);
 	}
 	
 	ImGui::Separator();

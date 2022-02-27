@@ -42,8 +42,6 @@ private:
 	// convinience functions to convert world to grid space
 	Tile* m_getTile(int col, int row);
 	Tile* m_getTile(glm::vec2 grid_position);
-	// Debug bool
-	bool m_bDebugView;
 };
 
 #endif /* defined (__PLAY_SCENE__) */
