@@ -101,6 +101,54 @@ void PlayScene::m_buildGrid()
 			m_pGrid.push_back(tile);
 		}
 	}
+
+	//setup the neighbour references for each tile
+	for (int row = 0; row < Config::ROW_NUM; ++row)
+	{
+		for (int col = 0; col < Config::COL_NUM; ++col)
+		{
+			Tile* tile = m_getTile(col, row);
+
+			//top
+			if (row == 0)
+			{
+				tile->setNeighbourTile(TOP_TILE, nullptr);
+			}
+			else
+			{
+				tile->setNeighbourTile(TOP_TILE, m_getTile(col, row -1));
+			}
+			//Right
+			if (col == Config::COL_NUM -1)
+			{
+				tile->setNeighbourTile(RIGHT_TILE, nullptr);
+			}
+			else
+			{
+				tile->setNeighbourTile(RIGHT_TILE, m_getTile(col+1, row ));
+			}
+
+			//Bottom
+			if (row == Config::COL_NUM - 1)
+			{
+				tile->setNeighbourTile(BOTTOM_TILE, nullptr);
+			}
+			else
+			{
+				tile->setNeighbourTile(BOTTOM_TILE, m_getTile(col, row +1));
+			}
+
+			//Left
+			if (col == 0)
+			{
+				tile->setNeighbourTile(LEFT_TILE, nullptr);
+			}
+			else
+			{
+				tile->setNeighbourTile(LEFT_TILE, m_getTile(col -1, row));
+			}
+		}
+	}
 }
 
 bool PlayScene::m_getGridEnabled() const
