@@ -280,7 +280,7 @@ void PlayScene::GUI_Function()
 			goal_position[1])->getTransform()->position + offset;
 		m_pTarget->setGridPosition(goal_position[0], goal_position[1]);
 		m_getTile(m_pTarget->getGridPosition())->setTileStatus(START);
-
+		m_computeTileCosts();
 
 	}
 
