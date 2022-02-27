@@ -66,6 +66,13 @@ void PlayScene::start()
 	m_pSpaceShip = new SpaceShip();
 	addChild(m_pSpaceShip);
 
+	m_pTile = new Tile();
+	m_pTile->getTransform()->position = glm::vec2(400.0f, 300.0f);
+	m_pTile->setParent(this);
+	m_pTile->addLabels();
+	addChild(m_pTile);
+	m_pTile->setLabelsEnabled(true);
+
 	
 	SoundManager::Instance().load("../Assets/audio/yay.ogg", "yay", SOUND_SFX);
 

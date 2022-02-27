@@ -99,7 +99,7 @@ void Tile::addLabels()
 	m_costLabel->setEnabled(false);
 
 	//status Label
-	m_statusLabel = new Label("99.9", "Consolas", 12);
+	m_statusLabel = new Label("=", "Consolas", 12);
 	m_statusLabel->getTransform()->position = getTransform()->position + offset + glm::vec2(0.0f, 6.0f);
 	getParent()->addChild(m_statusLabel);
 	m_statusLabel->setEnabled(false);
