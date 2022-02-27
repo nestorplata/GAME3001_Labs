@@ -3,7 +3,7 @@
 #define __PLAY_SCENE__
 
 #include "Scene.h"
-
+#include "Heuristic.h"
 #include "Target.h"
 #include "SpaceShip.h"
 #include "Tile.h"
@@ -38,10 +38,14 @@ private:
 	void m_buildGrid();
 	bool m_getGridEnabled() const;
 	void m_setGridEnabled(bool state);
+	void m_computerTileCosts();
 
 	// convinience functions to convert world to grid space
 	Tile* m_getTile(int col, int row);
 	Tile* m_getTile(glm::vec2 grid_position);
+
+	//heuristics
+	Heuristic m_currentHeuristic;
 };
 
 #endif /* defined (__PLAY_SCENE__) */
