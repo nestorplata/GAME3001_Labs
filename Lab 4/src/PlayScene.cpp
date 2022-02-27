@@ -64,14 +64,18 @@ void PlayScene::start()
 
 
 	m_pTarget = new Target(); // instantiating a new Target object - allocating memory on the Heap
+	m_pTarget->getTransform()->position = m_getTile(11, 11)->getTransform()->position + offset;
+	m_pTarget->setGridPosition(11.0f, 11.0f);
 	addChild(m_pTarget);
 
 	m_pSpaceShip = new SpaceShip();
+	m_pSpaceShip->getTransform()->position = m_getTile(1, 3)->getTransform()->position + offset;
+	m_pSpaceShip->setGridPosition(1.0f, 3.0f);
 	addChild(m_pSpaceShip);
 	
+	//preloaded sounds
 	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "thunder", SOUND_SFX);
 	SoundManager::Instance().load("../Assets/audio/yay.ogg", "yay", SOUND_SFX);
-
 
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
@@ -148,17 +152,30 @@ void PlayScene::GUI_Function()
 	
 	ImGui::Separator();
 	// spaceship properties
-	static float start_position[2] = { m_pSpaceShip->getTransform()->position.x, m_pSpaceShip->getTransform()->position.y };
-	if (ImGui::SliderFloat2("Start Position", start_position, 0.0f, 600.0f))
+	static float start_position[2] = { m_pSpaceShip->getGridPosition().x, m_pSpaceShip->getGridPosition().y };
+	if (ImGui::SliderFloat2("Start Position", start_position, 0.0f,Config::COL_NUM -1))
 	{
-		m_pSpaceShip->getTransform()->position = glm::vec2(start_position[0], start_position[1]);
+		if (start_position[1] > Config::ROW_NUM - 1)
+		{
+			start_position[1] = Config::ROW_NUM - 1;
+		}
+		m_pSpaceShip->getTransform()->position = m_getTile(start_position[0],
+			start_position[1])->getTransform()->position + offset;
+		m_pSpaceShip->setGridPosition(start_position[0], start_position[1]);
 	}
 	// target properties
 	
-	static float goal[2] = { m_pTarget->getTransform()->position.x, m_pTarget->getTransform()->position.y};
-	if(ImGui::SliderFloat2("Goal Position", goal, 0.0f, 600.0f))
+	static float goal_position[2] = { m_pTarget->getGridPosition().x, m_pTarget->getTransform()->position.y};
+	if(ImGui::SliderFloat2("Goal Position", goal_position, 0.0f, Config::COL_NUM - 1))
 	{
-		m_pTarget->getTransform()->position = glm::vec2(goal[0], goal[1]);
+		if (goal_position[1] > Config::ROW_NUM - 1)
+		{
+			goal_position[1] = Config::ROW_NUM - 1;
+		}
+		m_pTarget->getTransform()->position = m_getTile(goal_position[0],
+			goal_position[1])->getTransform()->position + offset;
+		m_pSpaceShip->setGridPosition(goal_position[0], goal_position[1]);
+
 	}
 
 	ImGui::End();
