@@ -38,7 +38,7 @@ private:
 	void m_buildGrid();
 	bool m_getGridEnabled() const;
 	void m_setGridEnabled(bool state);
-	void m_computerTileCosts();
+	void m_computeTileCosts();
 
 	// convinience functions to convert world to grid space
 	Tile* m_getTile(int col, int row);

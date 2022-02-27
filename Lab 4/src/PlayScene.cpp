@@ -61,6 +61,7 @@ void PlayScene::start()
 	m_buildGrid();
 
 	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
+	m_currentHeuristic = MANHATTAN;
 
 
 	m_pTarget = new Target(); // instantiating a new Target object - allocating memory on the Heap
@@ -80,6 +81,8 @@ void PlayScene::start()
 	//preloaded sounds
 	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "thunder", SOUND_SFX);
 	SoundManager::Instance().load("../Assets/audio/yay.ogg", "yay", SOUND_SFX);
+
+	m_computeTileCosts();
 
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
@@ -167,9 +170,33 @@ void PlayScene::m_setGridEnabled(bool state)
 	}
 }
 
-void PlayScene::m_computerTileCosts()
+void PlayScene::m_computeTileCosts()
 {
+	float distance = 0.0f;
+	float dx = 0.0f;
+	float dy = 0.0f;
 
+	//for each tile in the grid, loop
+	for (auto tile : m_pGrid)
+	{
+		//calculate the distance from each tile to the goal tile]
+		switch(m_currentHeuristic)
+		{
+		case MANHATTAN:
+			dx = abs(tile->getGridPosition().x - m_pTarget->getGridPosition().x);
+			dy = abs(tile->getGridPosition().y - m_pTarget->getGridPosition().y);
+			distance = dx + dy;
+
+				break;
+		case EUCLIDEAN:
+			// computes the eucliden distance ("as the crow flies") for each tile
+			distance = Util::distance(tile->getGridPosition(), m_pTarget->getGridPosition());
+			break;
+
+		}
+
+		tile->setTileCost(distance);
+	}
 }
 
 Tile* PlayScene::m_getTile(const int col, const int row)
