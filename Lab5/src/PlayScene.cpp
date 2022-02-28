@@ -252,7 +252,8 @@ void PlayScene::GUI_Function()
 	ImGui::Separator();
 
 	// spaceship properties
-	static int start_position[2] = { m_pSpaceShip->getGridPosition().x, m_pSpaceShip->getGridPosition().y };
+	start_position[0] = m_pSpaceShip->getGridPosition().x;
+	start_position[1] = m_pSpaceShip->getGridPosition().y;
 	if (ImGui::SliderInt2("Start Position", start_position, 0,Config::COL_NUM -1))
 	{
 		if (start_position[1] > Config::ROW_NUM - 1)
@@ -268,7 +269,9 @@ void PlayScene::GUI_Function()
 	}
 	// target properties
 	
-	static int goal_position[2] = { m_pTarget->getGridPosition().x, m_pTarget->getTransform()->position.y};
+	goal_position[0] =  m_pTarget->getGridPosition().x;
+	goal_position[1] = m_pTarget->getGridPosition().y;
+
 	if(ImGui::SliderInt2("Goal Position", goal_position, 0, Config::COL_NUM - 1))
 	{
 		if (goal_position[1] > Config::ROW_NUM - 1)
@@ -286,4 +289,9 @@ void PlayScene::GUI_Function()
 
 	ImGui::End();
 }
+
+//for reset.
+
+int PlayScene::start_position[2];
+int PlayScene::goal_position[2];
 
