@@ -296,14 +296,6 @@ void PlayScene::m_displayPathList()
 	std::cout << "Path Length: " << m_pPathList.size() << std::endl;
 }
 
-void PlayScene::m_resetPathFinding()
-{
-}
-
-void PlayScene::m_resetSimulation()
-{
-}
-
 Tile* PlayScene::m_getTile(const int col, const int row)
 {
 	return m_pGrid[(row * Config::COL_NUM) + col];
@@ -318,8 +310,31 @@ Tile* PlayScene::m_getTile(const glm::vec2 grid_position)
 
 }
 
+void PlayScene::m_resetPathFinding()
+{
+}
+
+void PlayScene::m_resetSimulation()
+{
+}
+
 void PlayScene::m_moveShip()
 {
+	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
+	if (m_moveCounter < m_pPathList.size())
+	{
+		auto pathTile_gridPosition = m_pPathList[m_moveCounter]->getGridPosition();
+		m_pSpaceShip->getTransform()->position = m_getTile(pathTile_gridPosition)->getTransform()->position + offset;
+		m_pSpaceShip->setGridPosition(pathTile_gridPosition.x, pathTile_gridPosition.y);
+		if (Game::Instance().getFrames() % 20 == 0)
+		{
+			m_moveCounter++;
+		}
+	}
+	else
+	{
+		m_shipIsMoving = false;
+	}
 }
 
 
