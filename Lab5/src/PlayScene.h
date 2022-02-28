@@ -47,7 +47,7 @@ private:
 	void m_resetPathFinding();
 	void m_resetSimulation();
 
-	std::vector<Tile*> m_OpenList;
+	std::vector<Tile*> m_pOpenList;
 	std::vector<Tile*> m_pClosedList;
 	std::vector<Tile*> m_pPathList;
 	
