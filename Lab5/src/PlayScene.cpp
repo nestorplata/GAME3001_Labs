@@ -102,8 +102,8 @@ void PlayScene::m_buildGrid()
 			tile->getTransform()->position = glm::vec2(col* tile_size, row*tile_size);
 			tile->setGridPosition(col, row); //grid position
 			tile->setParent(this);
-			tile->addLabels();
 			addChild(tile);
+			tile->addLabels();
 			tile->setEnabled(false);
 			m_pGrid.push_back(tile);
 		}
@@ -289,6 +289,11 @@ void PlayScene::m_findShortestPath()
 
 void PlayScene::m_displayPathList()
 {
+	for (auto tile : m_pPathList)
+	{
+		std::cout << "(" << tile->getGridPosition().x << ", " << tile->getGridPosition().y << ")" << std::endl;
+	}
+	std::cout << "Path Length: " << m_pPathList.size() << std::endl;
 }
 
 void PlayScene::m_resetPathFinding()
@@ -352,6 +357,34 @@ void PlayScene::GUI_Function()
 		m_currentHeuristic = static_cast<Heuristic>(radio);
 		m_computeTileCosts();
 	}
+
+	ImGui::Separator();
+	if (ImGui::Button("Find Shortest Path"))
+	{
+		m_findShortestPath();
+	}
+
+	ImGui::Separator();
+	if (ImGui::Button("Start"))
+	{
+		if (!m_shipIsMoving)
+		{
+			m_shipIsMoving = true;
+		}
+	}
+
+	ImGui::SameLine();
+	if (ImGui::Button("Reset PathFinding"))
+	{
+		m_resetPathFinding();
+	}
+
+	ImGui::SameLine();
+	if (ImGui::Button("Reset Simulation"))
+	{
+		m_resetSimulation();
+	}
+
 
 	ImGui::Separator();
 
