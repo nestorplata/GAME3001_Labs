@@ -31,6 +31,9 @@ void Tile::draw()
 	case CLOSED:
 		Util::DrawFilledRect(getTransform()->position, getWidth(), getHeight(), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
 		break;
+	case IMPASSABLE:
+		Util::DrawFilledRect(getTransform()->position, getWidth(), getHeight(), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
 	default:
 		Util::DrawRect(getTransform()->position, getWidth(), getHeight());
 		break;

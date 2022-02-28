@@ -50,6 +50,7 @@ private:
 	std::vector<Tile*> m_pOpenList;
 	std::vector<Tile*> m_pClosedList;
 	std::vector<Tile*> m_pPathList;
+	Tile* m_pImpassableTiles[3];
 	
 	// convinience functions to convert world to grid space
 	Tile* m_getTile(int col, int row);
@@ -60,6 +61,8 @@ private:
 
 	int m_moveCounter = 0;
 	bool m_shipIsMoving = false;
+	bool m_ignoreimpassableTiles = false;
+
 	void m_moveShip();
 
 	static int start_position[2];

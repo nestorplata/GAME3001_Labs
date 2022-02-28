@@ -72,15 +72,26 @@ void PlayScene::start()
 	m_pTarget->getTransform()->position = m_getTile(11, 11)->getTransform()->position + offset;
 	m_pTarget->setGridPosition(11.0f, 11.0f);
 	m_getTile(11, 11)->setTileStatus(GOAL);
-
 	addChild(m_pTarget);
 
 	m_pSpaceShip = new SpaceShip();
 	m_pSpaceShip->getTransform()->position = m_getTile(1, 3)->getTransform()->position + offset;
 	m_pSpaceShip->setGridPosition(1.0f, 3.0f);
 	m_getTile(1, 3)->setTileStatus(START);
-
 	addChild(m_pSpaceShip);
+
+	//Impassable Tiles e.g
+	//Tile* m_pImpassableTiles[3];
+	m_pImpassableTiles[0] = m_getTile(4, 3);
+	m_pImpassableTiles[1] = m_getTile(4, 4);
+	m_pImpassableTiles[2] = m_getTile(4, 5);
+
+	m_pImpassableTiles[0]->setTileStatus(IMPASSABLE);
+	m_pImpassableTiles[1]->setTileStatus(IMPASSABLE);
+	m_pImpassableTiles[2]->setTileStatus(IMPASSABLE);
+
+
+
 	
 	//preloaded sounds
 	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "thunder", SOUND_SFX);
@@ -228,9 +239,11 @@ void PlayScene::m_findShortestPath()
 			for (int index = 0; index < NUM_OF_NEIGHBOUR_TILES; ++index)
 			{
 				const auto neighbour = m_pOpenList[0]->getNeighbourTile(static_cast<NeighbourTile>(index));
-				if (neighbour == nullptr || neighbour->getTileStatus() == IMPASSABLE)
-				{
-					continue;
+				if (m_ignoreimpassableTiles == false) {
+					if (neighbour == nullptr || neighbour->getTileStatus() == IMPASSABLE)
+					{
+						continue;
+					}
 				}
 				neighbour_list.push_back(neighbour);
 			}
@@ -332,6 +345,14 @@ void PlayScene::m_resetPathFinding()
 	start_position[0] = m_pSpaceShip->getGridPosition().x;
 	start_position[1] = m_pSpaceShip->getGridPosition().y;
 
+	m_pImpassableTiles[0] = m_getTile(4, 3);
+	m_pImpassableTiles[1] = m_getTile(4, 4);
+	m_pImpassableTiles[2] = m_getTile(4, 5);
+	m_pImpassableTiles[0]->setTileStatus(IMPASSABLE);
+	m_pImpassableTiles[1]->setTileStatus(IMPASSABLE);
+	m_pImpassableTiles[2]->setTileStatus(IMPASSABLE);
+
+
 	m_moveCounter = 0;
 	m_shipIsMoving = false;
 }
@@ -355,6 +376,13 @@ void PlayScene::m_resetSimulation()
 	m_getTile(1, 3)->setTileStatus(START);
 	start_position[0] = m_pSpaceShip->getGridPosition().x;
 	start_position[1] = m_pSpaceShip->getGridPosition().y;
+
+	m_pImpassableTiles[0] = m_getTile(4, 3);
+	m_pImpassableTiles[1] = m_getTile(4, 4);
+	m_pImpassableTiles[2] = m_getTile(4, 5);
+	m_pImpassableTiles[0]->setTileStatus(IMPASSABLE);
+	m_pImpassableTiles[1]->setTileStatus(IMPASSABLE);
+	m_pImpassableTiles[2]->setTileStatus(IMPASSABLE);
 
 
 }
@@ -412,6 +440,19 @@ void PlayScene::GUI_Function()
 	{
 		m_currentHeuristic = static_cast<Heuristic>(radio);
 		m_computeTileCosts();
+	}
+
+	ImGui::Separator();
+	if (ImGui::Button("Ignore Impassable Tiles"))
+	{
+		if (m_ignoreimpassableTiles==false) {
+			m_ignoreimpassableTiles = true;
+		}
+		else
+		{
+			m_ignoreimpassableTiles = false;
+
+		}
 	}
 
 	ImGui::Separator();
