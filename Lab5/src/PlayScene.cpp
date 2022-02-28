@@ -312,6 +312,28 @@ Tile* PlayScene::m_getTile(const glm::vec2 grid_position)
 
 void PlayScene::m_resetPathFinding()
 {
+	m_pPathList.clear();
+	m_pPathList.shrink_to_fit();
+	m_pOpenList.clear();
+	m_pOpenList.shrink_to_fit();
+	m_pClosedList.clear();
+	m_pClosedList.shrink_to_fit();
+
+	//reset tile statuses
+	for (auto tile : m_pGrid)
+	{
+		tile->setTileStatus(UNVISITED);
+	}
+	m_getTile(m_pTarget->getGridPosition())->setTileStatus(GOAL);
+	goal_position[0] = m_pTarget->getGridPosition().x;
+	goal_position[0] = m_pTarget->getGridPosition().y;
+
+	m_getTile(m_pSpaceShip->getGridPosition())->setTileStatus(START);
+	start_position[0] = m_pSpaceShip->getGridPosition().x;
+	start_position[0] = m_pSpaceShip->getGridPosition().y;
+
+	m_moveCounter = 0;
+	m_shipIsMoving = false;
 }
 
 void PlayScene::m_resetSimulation()
@@ -417,7 +439,7 @@ void PlayScene::GUI_Function()
 			start_position[1])->getTransform()->position + offset;
 		m_pSpaceShip->setGridPosition(start_position[0], start_position[1]);
 		m_getTile(m_pSpaceShip->getGridPosition())->setTileStatus(START);
-
+		m_resetPathFinding();
 	}
 	// target properties
 	
@@ -436,6 +458,7 @@ void PlayScene::GUI_Function()
 		m_pTarget->setGridPosition(goal_position[0], goal_position[1]);
 		m_getTile(m_pTarget->getGridPosition())->setTileStatus(START);
 		m_computeTileCosts();
+		m_resetPathFinding();
 
 	}
 
