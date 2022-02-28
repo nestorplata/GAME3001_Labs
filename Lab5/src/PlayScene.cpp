@@ -282,6 +282,8 @@ void PlayScene::m_findShortestPath()
 		Tile* goal = m_pPathList.at(m_pPathList.size() - 2);
 		m_pPathList.erase(m_pPathList.end() - 2);
 		m_pPathList.push_back(goal);
+
+		m_displayPathList();
 	}
 }
 
