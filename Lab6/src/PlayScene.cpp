@@ -60,15 +60,31 @@ void PlayScene::start()
 	m_guiTitle = "Play Scene";
 
 	m_pTarget = new Target(); // instantiating a new Target object - allocating memory on the Heap
-	m_pTarget->getTransform()->position = glm::vec2(400.0f, 300.0f);
+	m_pTarget->getTransform()->position = glm::vec2(500.0f, 300.0f);
 	addChild(m_pTarget);
 
 	m_pSpaceShip = new SpaceShip();
-	m_pSpaceShip->getTransform()->position = glm::vec2(200.0f, 300.0f);
+	m_pSpaceShip->getTransform()->position = glm::vec2(100.0f, 300.0f);
 	addChild(m_pSpaceShip);
 
+	m_pObstacle1 = new Obstacle();
+	m_pObstacle1->getTransform()->position = glm::vec2(300.0f, 80.0f);
+	m_pObstacle1->setHeight(50);
+	addChild(m_pObstacle1);
+
+	m_pObstacle2 = new Obstacle();
+	m_pObstacle2->getTransform()->position = glm::vec2(300.0f, 300.0f);
+	m_pObstacle2->setWidth(100);
+	addChild(m_pObstacle2);
+
+	m_pObstacle3 = new Obstacle();
+	m_pObstacle3->getTransform()->position = glm::vec2(300.0f, 480.0f);
+
+	addChild(m_pObstacle3);
+
+
 	m_isGridEnabled = false;
-	// TODO: m_storeObstacles();
+	m_storeObstacles();
 	m_buildGrid();
 	m_toggleGrid(m_isGridEnabled);
 
@@ -83,7 +99,7 @@ void PlayScene::m_buildGrid()
 	const auto tile_size = Config::TILE_SIZE;
 	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
 
-	//TODO: m_clearNodes(); //redraw the obstacle if the obstacle moves
+	m_clearNodes(); //redraw the obstacle if the obstacle moves
 
 	for (int row = 0; row < Config::ROW_NUM; ++row)
 	{
@@ -155,6 +171,13 @@ void PlayScene::m_checkShipLOS(DisplayObject* target_object) const
 
 void PlayScene::m_storeObstacles()
 {
+	for (auto display_object : getDisplayList())
+	{
+		if (display_object->getType() == OBSTACLE)
+		{
+			m_pObstacles.push_back(dynamic_cast<Obstacle*>(display_object));
+		}
+	}
 }
 
 void PlayScene::m_clearNodes()
