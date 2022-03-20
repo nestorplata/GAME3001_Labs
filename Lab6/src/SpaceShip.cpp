@@ -18,10 +18,14 @@ SpaceShip::SpaceShip()
 	getRigidBody()->isColliding = false;
 
 	// starting motion properties
+	setCurrentHeading(0.0f);
+	setCurrentDirection(glm::vec2(1.0f, 0.0f));
 	m_maxSpeed = 20.0f; // a maximum number of pixels moved per frame
 	m_turnRate = 5.0f; // a maximum number of degrees to turn each time-step
 	m_accelerationRate = 4.0f; // a maximum number of pixels to add to the velocity each frame
 	
+	setLOSDistance(400.0f);
+	setLOSColour(glm::uvec4(1, 0, 0, 1));
 	Agent::updateWhiskers(45.0f);
 
 	setType(AGENT);
@@ -38,6 +42,11 @@ void SpaceShip::draw()
 
 	// draw the target
 	TextureManager::Instance().draw("space_ship", x, y, getCurrentHeading(), 255, isCentered());
+
+	//Draw LOS
+	Util::DrawLine(getTransform()->position, getTransform()->position + getCurrentDirection() * getLOSDistance(), getLOSColour());
+
+
 }
 
 void SpaceShip::update()
