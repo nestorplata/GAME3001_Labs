@@ -25,6 +25,7 @@ void PlayScene::draw()
 void PlayScene::update()
 {
 	updateDisplayList();
+	m_checkShipLOS(m_pTarget);
 
 }
 
@@ -124,8 +125,32 @@ void PlayScene::m_toggleGrid(bool state)
 	}
 }
 
-void PlayScene::m_checkShipLOS(DisplayObject* target_object)
+void PlayScene::m_checkShipLOS(DisplayObject* target_object) const
 {
+	m_pSpaceShip->setHasLOS(false);
+
+	const auto ship_to_target_distance = Util::getClosestEdge(m_pSpaceShip->getTransform()->position, target_object);
+	if (ship_to_target_distance <= m_pSpaceShip->getLOSDistance())
+	{
+		std::vector<DisplayObject*> contact_list;
+		for (auto display_object : getDisplayList())
+		{
+			if (display_object->getType() == PATH_NODE) { continue; }
+			if ((display_object->getType() != m_pSpaceShip->getType()) && (display_object->getType() != target_object->getType()))
+			{
+				//check if the display object is closer to the spaceship than the target 
+				auto ship_to_object_distance = Util::getClosestEdge(m_pSpaceShip->getTransform()->position, display_object);
+				if (ship_to_object_distance <= ship_to_target_distance)
+				{
+					contact_list.push_back(display_object);
+				}
+			}
+		}
+		const auto has_LOS = CollisionManager::LOSCheck(m_pSpaceShip,
+			m_pSpaceShip->getTransform()->position + m_pSpaceShip->getCurrentDirection() * m_pSpaceShip->getLOSDistance(),
+			contact_list, target_object);
+		m_pSpaceShip->setHasLOS(has_LOS);
+	}
 }
 
 void PlayScene::m_storeObstacles()
