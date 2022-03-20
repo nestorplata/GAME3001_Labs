@@ -58,23 +58,19 @@ void PlayScene::start()
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
 
-	m_buildGrid();
-
-	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
-	
-
-
 	m_pTarget = new Target(); // instantiating a new Target object - allocating memory on the Heap
 	m_pTarget->getTransform()->position = glm::vec2(400.0f, 300.0f);
 	addChild(m_pTarget);
 
 	m_pSpaceShip = new SpaceShip();
 	m_pSpaceShip->getTransform()->position = glm::vec2(200.0f, 300.0f);
-
 	addChild(m_pSpaceShip);
 
+	m_isGridEnabled = false;
+	// TODO: m_storeObstacles();
+	m_buildGrid();
+	m_toggleGrid(m_isGridEnabled);
 
-	
 	//preloaded sounds
 	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "thunder", SOUND_SFX);
 	SoundManager::Instance().load("../Assets/audio/yay.ogg", "yay", SOUND_SFX);
@@ -84,14 +80,68 @@ void PlayScene::start()
 void PlayScene::m_buildGrid()
 {
 	const auto tile_size = Config::TILE_SIZE;
+	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
+
+	//TODO: m_clearNodes(); //redraw the obstacle if the obstacle moves
+
 	for (int row = 0; row < Config::ROW_NUM; ++row)
 	{
 		for (int col = 0; col < Config::COL_NUM; ++col)
 		{
-
+			//determine which path_nodes to keep
+			PathNode* path_node = new PathNode();
+			path_node->getTransform()->position = glm::vec2((col * tile_size) + offset.x, (row * tile_size) + offset.y);
+			bool keep_node = true;
+			for (auto obstacle : m_pObstacles)
+			{
+				//determine which path_nodes to keep
+				if (CollisionManager::AABBCheckWithBuffer(path_node, obstacle, m_obstacleBuffer))
+				{
+					keep_node = false;
+				}
+			}
+			if (keep_node)
+			{
+				addChild(path_node);
+				m_pGrid.push_back(path_node);
+			}
+			else
+			{
+				delete path_node;
+			}
 		}
 	}
+	//if my grid is supposed to be hidden - make it so
+	m_toggleGrid(m_isGridEnabled);
 
+}
+
+void PlayScene::m_toggleGrid(bool state)
+{
+	for (auto path_node : m_pGrid)
+	{
+		path_node->setVisible(state);
+	}
+}
+
+void PlayScene::m_checkShipLOS(DisplayObject* target_object)
+{
+}
+
+void PlayScene::m_storeObstacles()
+{
+}
+
+void PlayScene::m_clearNodes()
+{
+	m_pGrid.clear();
+	for (auto display_object : getDisplayList())
+	{
+		if (display_object->getType() == PATH_NODE)
+		{
+			removeChild(display_object);
+		}
+	}
 }
 
 
@@ -111,7 +161,7 @@ void PlayScene::GUI_Function()
 
 	if (ImGui::Checkbox("Toggle Grid", &m_isGridEnabled))
 	{
-
+		m_toggleGrid(m_isGridEnabled);
 	}
 
 	ImGui::Separator();
@@ -136,5 +186,8 @@ void PlayScene::GUI_Function()
 
 	ImGui::End();
 }
+
+
+int PlayScene::m_obstacleBuffer;
 
 
