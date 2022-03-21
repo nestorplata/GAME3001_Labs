@@ -111,6 +111,12 @@ void Agent::setHasLOS(const bool state)
 	m_LOSColour = (m_hasLOS) ? glm::vec4(0, 1, 0, 1) : glm::vec4(1, 0, 0, 1);
 }
 
+void Agent::setHasLOS(const bool state, const glm::vec4 colour)
+{
+	m_hasLOS = state;
+	m_LOSColour = (m_hasLOS) ? colour : glm::vec4(1, 0, 0, 1);
+}
+
 void Agent::setCurrentHeading(const float heading)
 {
 	m_currentHeading = heading;

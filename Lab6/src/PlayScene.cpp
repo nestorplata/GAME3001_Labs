@@ -76,6 +76,7 @@ void PlayScene::start()
 	m_guiTitle = "Play Scene";
 
 	//crate new obstacles from a file
+	m_createObstaclesFromFile();
 	//TODO: File Load Logic
 	m_pTarget = new Target(); // instantiating a new Target object - allocating memory on the Heap
 	m_pTarget->getTransform()->position = glm::vec2(500.0f, 300.0f);
@@ -150,30 +151,34 @@ void PlayScene::m_toggleGrid(bool state)
 
 bool PlayScene::m_checkAgentLOS(Agent* agent, DisplayObject* target_object) 
 {
-	m_pSpaceShip->setHasLOS(false);
+	bool hasLOS = false;
+	agent->setHasLOS(hasLOS);
+	glm::vec4 LOSColour;
 
-	const auto ship_to_target_distance = Util::getClosestEdge(m_pSpaceShip->getTransform()->position, target_object);
-	if (ship_to_target_distance <= m_pSpaceShip->getLOSDistance())
+	const auto AgentToTargetDistance = Util::getClosestEdge(agent->getTransform()->position, target_object);
+	if (AgentToTargetDistance <= agent->getLOSDistance())
 	{
 		std::vector<DisplayObject*> contact_list;
 		for (auto display_object : getDisplayList())
 		{
-			if (display_object->getType() == PATH_NODE) { continue; }
-			if ((display_object->getType() != m_pSpaceShip->getType()) && (display_object->getType() != target_object->getType()))
-			{
 				//check if the display object is closer to the spaceship than the target 
-				auto ship_to_object_distance = Util::getClosestEdge(m_pSpaceShip->getTransform()->position, display_object);
-				if (ship_to_object_distance <= ship_to_target_distance)
+				const auto AgentToObjectDistance = Util::getClosestEdge(m_pSpaceShip->getTransform()->position, display_object);
+				if (AgentToObjectDistance <= AgentToTargetDistance) continue;
+
+				if ((display_object->getType() != AGENT) && (display_object->getType() != PATH_NODE) && (display_object->getType() != TARGET))
 				{
 					contact_list.push_back(display_object);
 				}
-			}
+
 		}
-		const auto has_LOS = CollisionManager::LOSCheck(m_pSpaceShip,
-			m_pSpaceShip->getTransform()->position + m_pSpaceShip->getCurrentDirection() * m_pSpaceShip->getLOSDistance(),
-			contact_list, target_object);
-		m_pSpaceShip->setHasLOS(has_LOS);
+		const glm::vec2 agentEndPoint = agent->getTransform()->position + agent->getCurrentDirection() * agent->getLOSDistance();
+		hasLOS = CollisionManager::LOSCheck(agent, agentEndPoint, contact_list, target_object);
+
+		LOSColour = (target_object->getType() == AGENT) ? glm::vec4(0, 0, 1, 1) : glm::vec4(0, 1, 0, 1);
+		agent->setHasLOS(hasLOS, LOSColour);
 	}
+
+	return hasLOS;
 }
 
 bool PlayScene::m_checkPathNodeLOS(PathNode* path_nade, DisplayObject* target_object)
@@ -245,6 +250,49 @@ void PlayScene::GUI_Function()
 	}
 
 	ImGui::Separator();
+	if (ImGui::Button("Node LOS Target", { 300, 20 }))
+	{
+		m_LOSMode = 0;
+	}
+
+	if (m_LOSMode ==0)
+	{
+		ImGui::SameLine();
+		ImGui::Text("<Activate>");
+
+	}
+
+	if (ImGui::Button("Node LOS SpaceShip", { 300, 20 }))
+	{
+		m_LOSMode = 1;
+	}
+
+	if (m_LOSMode == 1)
+	{
+		ImGui::SameLine();
+		ImGui::Text("<Activate>");
+
+	}
+
+	if (ImGui::Button("Node LOS Targe and SpaceShip", { 300, 20 }))
+	{
+		m_LOSMode = 2;
+	}
+
+	if (m_LOSMode == 2)
+	{
+		ImGui::SameLine();
+		ImGui::Text("<Activate>");
+
+	}
+
+	if (ImGui::SliderInt("Path Node LOS Distance", &m_pathNodeLOSDistance, 0, 1000))
+	{
+		m_setPathNodeLOSDistance(m_pathNodeLOSDistance);
+	}
+
+	ImGui::Separator();
+
 
 	// spaceship properties
 	static int shipPosition[] = { m_pSpaceShip->getTransform()->position.x, m_pSpaceShip->getTransform()->position.y };

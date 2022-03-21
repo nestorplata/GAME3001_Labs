@@ -41,6 +41,7 @@ public:
 	void setCurrentDirection(glm::vec2 new_direction);
 	void setLOSDistance(float distance);
 	void setHasLOS(bool state);
+	void setHasLOS(const bool state, const glm::vec4 colour);
 	void setCurrentHeading(float heading);
 	void setLOSColour(glm::vec4 colour);
 
