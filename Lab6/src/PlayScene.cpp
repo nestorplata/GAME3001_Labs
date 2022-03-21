@@ -24,12 +24,11 @@ void PlayScene::draw()
 {
 	drawDisplayList();
 
-	m_drawShortestDistance(m_pSpaceShip, NULL, m_pTarget);
-
+	if (m_isShortestPathEnabled)
+	{
 		Util::DrawLine(m_pSpaceShip->getTransform()->position, ShortestpathNode, glm::vec4(1, 0, 1, 1));
 		Util::DrawLine(ShortestpathNode, m_pTarget->getTransform()->position, glm::vec4(1, 0, 1, 1));
-
-
+	}
 	SDL_SetRenderDrawColor(Renderer::Instance().getRenderer(), 255, 255, 255, 255);
 }
 
@@ -222,6 +221,7 @@ void PlayScene::m_checkAllNodesWithBoth()
 		
 		if (LOSWithSpaceShip && LOSWithTarget)
 		{
+			
 			if (CollisionManager::squaredDistance(m_pSpaceShip->getTransform()->position, path_node->getTransform()->position) ==
 				CollisionManager::squaredDistance(path_node->getTransform()->position, m_pTarget->getTransform()->position))
 			{
@@ -249,6 +249,8 @@ void PlayScene::m_checkAllNodesWithBoth()
 					ShortestpathNode = path_node->getTransform()->position;
 
 				}
+
+				
 			}
 		}
 	}
@@ -263,11 +265,6 @@ void PlayScene::m_setPathNodeLOSDistance(const int dist)
 	}
 }
 
-void PlayScene::m_drawShortestDistance(Agent* agent, PathNode* path_node, DisplayObject* target_object)
-{
-	Util::DrawLine(agent->getTransform()->position, target_object->getTransform()->position, glm::vec4(1, 0, 1, 1));
-
-}
 
 void PlayScene::m_clearNodes()
 {
@@ -350,6 +347,10 @@ void PlayScene::GUI_Function()
 	{
 		ImGui::SameLine();
 		ImGui::Text("<Active>");
+		if (ImGui::Checkbox("Toggle Find Shortest Path", &m_isShortestPathEnabled))
+		{
+			m_toggleGrid(m_isShortestPathEnabled);
+		}
 	}
 
 	if (ImGui::SliderInt("Path Node LOS Distance", &m_pathNodeLOSDistance, 0, 1000))
@@ -359,6 +360,9 @@ void PlayScene::GUI_Function()
 
 	ImGui::Separator();
 
+
+
+	ImGui::Separator();
 	// spaceship properties
 
 	static int shipPosition[] = { m_pSpaceShip->getTransform()->position.x, m_pSpaceShip->getTransform()->position.y };

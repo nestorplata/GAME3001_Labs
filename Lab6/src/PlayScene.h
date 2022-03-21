@@ -28,6 +28,7 @@ private:
 	std::string m_guiTitle;
 	glm::vec2 m_mousePosition;
 	bool m_isGridEnabled;
+	bool m_isShortestPathEnabled =false;
 
 	// Game Objects
 	Target* m_pTarget;
@@ -46,7 +47,6 @@ private:
 	void m_checkAllNodesWithTarget(DisplayObject* target_object);
 	void m_checkAllNodesWithBoth();
 	void m_setPathNodeLOSDistance(int dist);
-	void m_drawShortestDistance(Agent* agent, PathNode* path_node, DisplayObject* target_object);
 	int m_LOSMode;
 
 	
@@ -56,16 +56,7 @@ private:
 	int m_obstacleBuffer;
 	int m_pathNodeLOSDistance;
 
-
-
-	bool isShortestpath =false;
-	glm::vec2 ShortestpathNodeT;
-	glm::vec2 ShortestpathNodeS;
 	glm::vec2 ShortestpathNode;
-
-
-	
-
 };
 
 #endif /* defined (__PLAY_SCENE__) */
