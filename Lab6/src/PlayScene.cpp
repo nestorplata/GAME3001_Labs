@@ -203,7 +203,7 @@ void PlayScene::GUI_Function()
 	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
 	//ImGui::ShowDemoWindow();
 	
-	ImGui::Begin("Lab 4 Debug Properties", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
+	ImGui::Begin("Lab 6 Debug Properties", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
 
 	ImGui::Separator();
 
@@ -222,7 +222,14 @@ void PlayScene::GUI_Function()
 		m_pSpaceShip->getTransform()->position.y = shipPosition[1];
 
 	}
+	// allow the ship to rotate
+	static int angle;
+	if (ImGui::SliderInt("Ship Direction", &angle, -180, 180))
+	{
+		m_pSpaceShip->setCurrentHeading(angle);
+	}
 
+	ImGui::Separator();
 	// target properties
 	static int targetPosition[] = { m_pTarget->getTransform()->position.x, m_pTarget->getTransform()->position.y };
 	if (ImGui::SliderInt2("Goal Position", targetPosition, 0, 600)) 
@@ -232,6 +239,27 @@ void PlayScene::GUI_Function()
 
 	}
 
+	ImGui::Separator();
+
+	//Add Obstacle position Control for all Obstacles
+
+	for (unsigned i = 0; i < m_pObstacles.size(); ++i)
+	{
+		int obstaclePosition[] = { m_pObstacles[i]->getTransform()->position.x, m_pObstacles[i]->getTransform()->position.y };
+		std::string label = "Obstacle" + std::to_string(i + 1) + " Position";
+		if (ImGui::SliderInt2(label.c_str(), obstaclePosition, 0, 600))
+		{
+			m_pObstacles[i]->getTransform()->position.x = obstaclePosition[0];
+			m_pObstacles[i]->getTransform()->position.y = obstaclePosition[1];
+			m_buildGrid();
+		}
+	}
+	ImGui::Separator();
+
+	if (ImGui::SliderInt("Obstacle Buffer", &m_obstacleBuffer, 0, 100))
+	{
+		m_buildGrid();
+	}
 	ImGui::End();
 }
 
