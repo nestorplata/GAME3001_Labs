@@ -6,7 +6,7 @@
 #include "imgui.h"
 #include "imgui_sdl.h"
 
-
+// required for scene
 #include "Renderer.h"
 #include "Util.h"
 #include "Config.h"
@@ -22,27 +22,35 @@ PlayScene::~PlayScene()
 
 void PlayScene::draw()
 {
-	drawDisplayList();	
+	drawDisplayList();
+
+	m_drawShortestDistance(m_pSpaceShip, NULL, m_pTarget);
+
+		Util::DrawLine(m_pSpaceShip->getTransform()->position, ShortestpathNode, glm::vec4(1, 0, 1, 1));
+		Util::DrawLine(ShortestpathNode, m_pTarget->getTransform()->position, glm::vec4(1, 0, 1, 1));
+
+
 	SDL_SetRenderDrawColor(Renderer::Instance().getRenderer(), 255, 255, 255, 255);
 }
 
 void PlayScene::update()
 {
 	updateDisplayList();
+
+
 	m_checkAgentLOS(m_pSpaceShip, m_pTarget);
 	switch (m_LOSMode)
 	{
 	case 0:
-		m_checkAllNodesWithTarget(m_pTarget);
+		m_checkAllNodesWithTarget(m_pTarget); // target
 		break;
 	case 1:
-		m_checkAllNodesWithTarget(m_pSpaceShip);
+		m_checkAllNodesWithTarget(m_pSpaceShip); // space ship
 		break;
 	case 2:
-		m_checkAllNodesWithBoth();
+		m_checkAllNodesWithBoth(); // both
 		break;
 	}
-
 }
 
 void PlayScene::clean()
@@ -75,30 +83,32 @@ void PlayScene::start()
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
 
-	//crate new obstacles from a file
+	// Create new obstacles from a file
 	m_createObstaclesFromFile();
-	//TODO: File Load Logic
-	m_pTarget = new Target(); // instantiating a new Target object - allocating memory on the Heap
-	m_pTarget->getTransform()->position = glm::vec2(500.0f, 300.0f);
-	addChild(m_pTarget);
 
-	m_pSpaceShip = new SpaceShip();
-	m_pSpaceShip->getTransform()->position = glm::vec2(100.0f, 300.0f);
-	addChild(m_pSpaceShip);
-
-	//setup a few more fields
-	m_LOSMode = 0;
+	// Setup a few more fields
+	m_LOSMode = 0; // future enum?
 	m_obstacleBuffer = 0;
 	m_pathNodeLOSDistance = 1000;
 	m_setPathNodeLOSDistance(m_pathNodeLOSDistance);
 
+	//setup the Grid
 	m_isGridEnabled = false;
 	m_buildGrid();
 	m_toggleGrid(m_isGridEnabled);
 
-	//preloaded sounds
-	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "thunder", SOUND_SFX);
+	m_pTarget = new Target();
+	m_pTarget->getTransform()->position = glm::vec2(450.0f, 300.0f);
+	addChild(m_pTarget, 2);
+
+	m_pSpaceShip = new SpaceShip();
+	m_pSpaceShip->getTransform()->position = glm::vec2(150.0f, 300.0f);
+	addChild(m_pSpaceShip, 3);
+
+	// preload sounds
 	SoundManager::Instance().load("../Assets/audio/yay.ogg", "yay", SOUND_SFX);
+	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "thunder", SOUND_SFX);
+
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
 
@@ -107,19 +117,19 @@ void PlayScene::m_buildGrid()
 	const auto tile_size = Config::TILE_SIZE;
 	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
 
-	m_clearNodes(); //redraw the obstacle if the obstacle moves
+	m_clearNodes(); // we will need clear nodes because we will rebuild/redraw the grid if we move an obstacle
 
+	// lay out a grid of path_nodes
 	for (int row = 0; row < Config::ROW_NUM; ++row)
 	{
 		for (int col = 0; col < Config::COL_NUM; ++col)
 		{
-			//determine which path_nodes to keep
 			PathNode* path_node = new PathNode();
 			path_node->getTransform()->position = glm::vec2((col * tile_size) + offset.x, (row * tile_size) + offset.y);
 			bool keep_node = true;
 			for (auto obstacle : m_pObstacles)
 			{
-				//determine which path_nodes to keep
+				// determine which path_nodes to keep
 				if (CollisionManager::AABBCheckWithBuffer(path_node, obstacle, m_obstacleBuffer))
 				{
 					keep_node = false;
@@ -127,7 +137,7 @@ void PlayScene::m_buildGrid()
 			}
 			if (keep_node)
 			{
-				addChild(path_node);
+				addChild(path_node, 1);
 				m_pGrid.push_back(path_node);
 			}
 			else
@@ -136,12 +146,12 @@ void PlayScene::m_buildGrid()
 			}
 		}
 	}
-	//if my grid is supposed to be hidden - make it so
-	m_toggleGrid(m_isGridEnabled);
 
+	// if Grid is supposed to be hidden - make it so!
+	m_toggleGrid(m_isGridEnabled);
 }
 
-void PlayScene::m_toggleGrid(bool state)
+void PlayScene::m_toggleGrid(const bool state)
 {
 	for (auto path_node : m_pGrid)
 	{
@@ -149,56 +159,115 @@ void PlayScene::m_toggleGrid(bool state)
 	}
 }
 
-bool PlayScene::m_checkAgentLOS(Agent* agent, DisplayObject* target_object) 
+bool PlayScene::m_checkAgentLOS(Agent * agent, DisplayObject * target_object)
 {
-	bool hasLOS = false;
-	agent->setHasLOS(hasLOS);
+	bool has_LOS = false; // default - no LOS
+	agent->setHasLOS(has_LOS);
 	glm::vec4 LOSColour;
 
+	// if ship to target distance is less than or equal to LOS Distance
 	const auto AgentToTargetDistance = Util::getClosestEdge(agent->getTransform()->position, target_object);
-	if (AgentToTargetDistance <= agent->getLOSDistance())
+	if (AgentToTargetDistance <= agent->getLOSDistance()) // we are in range
 	{
 		std::vector<DisplayObject*> contact_list;
 		for (auto display_object : getDisplayList())
 		{
-				//check if the display object is closer to the spaceship than the target 
-				const auto AgentToObjectDistance = Util::getClosestEdge(m_pSpaceShip->getTransform()->position, display_object);
-				if (AgentToObjectDistance <= AgentToTargetDistance) continue;
-
-				if ((display_object->getType() != AGENT) && (display_object->getType() != PATH_NODE) && (display_object->getType() != TARGET))
-				{
-					contact_list.push_back(display_object);
-				}
-
+			// check if the display_object is closer to the spaceship than the target
+			const auto AgentToObjectDistance = Util::getClosestEdge(agent->getTransform()->position, display_object);
+			if (AgentToObjectDistance > AgentToTargetDistance) continue;
+			if ((display_object->getType() != AGENT) && (display_object->getType() != PATH_NODE) && (display_object->getType() != TARGET))
+			{
+				contact_list.push_back(display_object);
+			}
 		}
+
 		const glm::vec2 agentEndPoint = agent->getTransform()->position + agent->getCurrentDirection() * agent->getLOSDistance();
-		hasLOS = CollisionManager::LOSCheck(agent, agentEndPoint, contact_list, target_object);
+		has_LOS = CollisionManager::LOSCheck(agent, agentEndPoint, contact_list, target_object);
 
 		LOSColour = (target_object->getType() == AGENT) ? glm::vec4(0, 0, 1, 1) : glm::vec4(0, 1, 0, 1);
-		agent->setHasLOS(hasLOS, LOSColour);
+
+		
+		agent->setHasLOS(has_LOS, LOSColour);
 	}
-
-	return hasLOS;
+	return has_LOS;
 }
 
-bool PlayScene::m_checkPathNodeLOS(PathNode* path_nade, DisplayObject* target_object)
+bool PlayScene::m_checkPathNodeLOS(PathNode * path_node, DisplayObject * target_object)
 {
-	return false;
+	// check angle to target so we can still use LOS distance for path_nodes
+	const auto target_direction = target_object->getTransform()->position - path_node->getTransform()->position;
+	const auto normalized_direction = Util::normalize(target_direction);
+	path_node->setCurrentDirection(normalized_direction);
+	return m_checkAgentLOS(path_node, target_object);
 }
 
-void PlayScene::m_checkAllNodesWithTarget(DisplayObject* target_object)
+void PlayScene::m_checkAllNodesWithTarget(DisplayObject * target_object)
 {
+	for (auto path_node : m_pGrid)
+	{
+		m_checkPathNodeLOS(path_node, target_object);
+	}
 }
 
 void PlayScene::m_checkAllNodesWithBoth()
 {
+	int Shortestdistance=1000000;
+	int ShortestMidPoint=1000000;
+	for (auto path_node : m_pGrid)
+	{
+		bool LOSWithSpaceShip = m_checkPathNodeLOS(path_node, m_pSpaceShip);
+		bool LOSWithTarget = m_checkPathNodeLOS(path_node, m_pTarget);
+		path_node->setHasLOS(LOSWithSpaceShip && LOSWithTarget, glm::vec4(0, 1, 1, 1));
+		
+		
+		if (LOSWithSpaceShip && LOSWithTarget)
+		{
+			if (CollisionManager::squaredDistance(m_pSpaceShip->getTransform()->position, path_node->getTransform()->position) ==
+				CollisionManager::squaredDistance(path_node->getTransform()->position, m_pTarget->getTransform()->position))
+			{
+				glm::vec2 ship = m_pSpaceShip->getTransform()->position;
+				glm::vec2 target = m_pTarget->getTransform()->position;
+
+				glm::vec2 MidPoint = glm::vec2((ship.x + target.x) / 2 , (ship.y + target.y) / 2);
+
+				if (CollisionManager::squaredDistance(MidPoint, path_node->getTransform()->position) < ShortestMidPoint)
+				{
+					ShortestMidPoint = CollisionManager::squaredDistance(MidPoint, path_node->getTransform()->position);
+					ShortestpathNode = path_node->getTransform()->position;
+				}
+			}
+			else {
+				if (CollisionManager::squaredDistance(m_pSpaceShip->getTransform()->position, path_node->getTransform()->position) < Shortestdistance)
+				{
+					Shortestdistance = CollisionManager::squaredDistance(m_pSpaceShip->getTransform()->position, path_node->getTransform()->position);
+					ShortestpathNode = path_node->getTransform()->position;
+
+				}
+				else if (CollisionManager::squaredDistance(path_node->getTransform()->position, m_pTarget->getTransform()->position) < Shortestdistance)
+				{
+					Shortestdistance = CollisionManager::squaredDistance(path_node->getTransform()->position, m_pTarget->getTransform()->position);
+					ShortestpathNode = path_node->getTransform()->position;
+
+				}
+			}
+		}
+	}
+
 }
 
-void PlayScene::m_setPathNodeLOSDistance(int dist)
+void PlayScene::m_setPathNodeLOSDistance(const int dist)
 {
+	for (auto path_node : m_pGrid)
+	{
+		path_node->setLOSDistance(static_cast<float>(dist));
+	}
 }
 
+void PlayScene::m_drawShortestDistance(Agent* agent, PathNode* path_node, DisplayObject* target_object)
+{
+	Util::DrawLine(agent->getTransform()->position, target_object->getTransform()->position, glm::vec4(1, 0, 1, 1));
 
+}
 
 void PlayScene::m_clearNodes()
 {
@@ -219,27 +288,27 @@ void PlayScene::m_createObstaclesFromFile()
 	{
 		std::cout << "Obstacle" << std::endl;
 		Obstacle* obstacle = new Obstacle();
-		float x, y, w, h;
-		inFile >> x >> y >> w >> h;
+		float x, y, w, h; // same way the file is organized
+		inFile >> x >> y >> w >> h; // read data from line in the file
 		obstacle->getTransform()->position = glm::vec2(x, y);
 		obstacle->setWidth(w);
 		obstacle->setHeight(h);
-		addChild(obstacle);
+		addChild(obstacle, 0);
 		m_pObstacles.push_back(obstacle);
 	}
+	inFile.close();
 }
-
-
 
 void PlayScene::GUI_Function()
 {
 	auto offset = glm::vec2(Config::TILE_SIZE * 0.5f, Config::TILE_SIZE * 0.5f);
+
 	// Always open with a NewFrame
 	ImGui::NewFrame();
 
 	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
 	//ImGui::ShowDemoWindow();
-	
+
 	ImGui::Begin("Lab 6 Debug Properties", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
 
 	ImGui::Separator();
@@ -255,11 +324,10 @@ void PlayScene::GUI_Function()
 		m_LOSMode = 0;
 	}
 
-	if (m_LOSMode ==0)
+	if (m_LOSMode == 0)
 	{
 		ImGui::SameLine();
-		ImGui::Text("<Activate>");
-
+		ImGui::Text("<Active>");
 	}
 
 	if (ImGui::Button("Node LOS SpaceShip", { 300, 20 }))
@@ -270,11 +338,10 @@ void PlayScene::GUI_Function()
 	if (m_LOSMode == 1)
 	{
 		ImGui::SameLine();
-		ImGui::Text("<Activate>");
-
+		ImGui::Text("<Active>");
 	}
 
-	if (ImGui::Button("Node LOS Targe and SpaceShip", { 300, 20 }))
+	if (ImGui::Button("Node LOS to both Target and SpaceShip", { 300, 20 }))
 	{
 		m_LOSMode = 2;
 	}
@@ -282,8 +349,7 @@ void PlayScene::GUI_Function()
 	if (m_LOSMode == 2)
 	{
 		ImGui::SameLine();
-		ImGui::Text("<Activate>");
-
+		ImGui::Text("<Active>");
 	}
 
 	if (ImGui::SliderInt("Path Node LOS Distance", &m_pathNodeLOSDistance, 0, 1000))
@@ -293,57 +359,54 @@ void PlayScene::GUI_Function()
 
 	ImGui::Separator();
 
-
 	// spaceship properties
+
 	static int shipPosition[] = { m_pSpaceShip->getTransform()->position.x, m_pSpaceShip->getTransform()->position.y };
-	if (ImGui::SliderInt2("Start Position", shipPosition, 0,600))
+	if (ImGui::SliderInt2("Ship Position", shipPosition, 0, 800))
 	{
 		m_pSpaceShip->getTransform()->position.x = shipPosition[0];
 		m_pSpaceShip->getTransform()->position.y = shipPosition[1];
-
 	}
+
 	// allow the ship to rotate
 	static int angle;
-	if (ImGui::SliderInt("Ship Direction", &angle, -180, 180))
+	if (ImGui::SliderInt("Ship Direction", &angle, -360, 360))
 	{
 		m_pSpaceShip->setCurrentHeading(angle);
 	}
 
 	ImGui::Separator();
-	// target properties
+
+	// Target properties
+
 	static int targetPosition[] = { m_pTarget->getTransform()->position.x, m_pTarget->getTransform()->position.y };
-	if (ImGui::SliderInt2("Goal Position", targetPosition, 0, 600)) 
+	if (ImGui::SliderInt2("Target Position", targetPosition, 0, 800))
 	{
 		m_pTarget->getTransform()->position.x = targetPosition[0];
 		m_pTarget->getTransform()->position.y = targetPosition[1];
-
 	}
 
 	ImGui::Separator();
 
-	//Add Obstacle position Control for all Obstacles
-
+	// Add Obstacle Position Control for all obstacles
 	for (unsigned i = 0; i < m_pObstacles.size(); ++i)
 	{
 		int obstaclePosition[] = { m_pObstacles[i]->getTransform()->position.x, m_pObstacles[i]->getTransform()->position.y };
 		std::string label = "Obstacle" + std::to_string(i + 1) + " Position";
-		if (ImGui::SliderInt2(label.c_str(), obstaclePosition, 0, 600))
+		if (ImGui::SliderInt2(label.c_str(), obstaclePosition, 0, 800))
 		{
 			m_pObstacles[i]->getTransform()->position.x = obstaclePosition[0];
 			m_pObstacles[i]->getTransform()->position.y = obstaclePosition[1];
 			m_buildGrid();
 		}
 	}
+
 	ImGui::Separator();
 
 	if (ImGui::SliderInt("Obstacle Buffer", &m_obstacleBuffer, 0, 100))
 	{
 		m_buildGrid();
 	}
+
 	ImGui::End();
 }
-
-
-//int PlayScene::m_obstacleBuffer;
-
-

@@ -321,7 +321,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\Assets\data\obstacle.txt">
+    <Text Include="..\Assets\data\obstacles.txt">
       <Filter>Data</Filter>
     </Text>
   </ItemGroup>

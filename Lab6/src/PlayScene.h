@@ -34,15 +34,19 @@ private:
 	SpaceShip* m_pSpaceShip;
 
 	std::vector<PathNode*> m_pGrid;
+	PathNode* shortestNode;
+
 	std::vector<Obstacle*> m_pObstacles;	
 
 	void m_buildGrid();
-	void m_toggleGrid(bool state);
+
+	void m_toggleGrid(const bool state);
 	bool m_checkAgentLOS(Agent* agent, DisplayObject* target_object);
-	bool m_checkPathNodeLOS(PathNode* path_nade, DisplayObject* target_object);
+	bool m_checkPathNodeLOS(PathNode* path_node, DisplayObject* target_object);
 	void m_checkAllNodesWithTarget(DisplayObject* target_object);
 	void m_checkAllNodesWithBoth();
 	void m_setPathNodeLOSDistance(int dist);
+	void m_drawShortestDistance(Agent* agent, PathNode* path_node, DisplayObject* target_object);
 	int m_LOSMode;
 
 	
@@ -51,6 +55,16 @@ private:
 
 	int m_obstacleBuffer;
 	int m_pathNodeLOSDistance;
+
+
+
+	bool isShortestpath =false;
+	glm::vec2 ShortestpathNodeT;
+	glm::vec2 ShortestpathNodeS;
+	glm::vec2 ShortestpathNode;
+
+
+	
 
 };
 
