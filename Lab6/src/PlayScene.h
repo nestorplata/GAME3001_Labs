@@ -32,21 +32,25 @@ private:
 	// Game Objects
 	Target* m_pTarget;
 	SpaceShip* m_pSpaceShip;
-	Obstacle* m_pObstacle1;
-	Obstacle* m_pObstacle2;
-	Obstacle* m_pObstacle3;
-	std::vector<Obstacle*> m_pObstacles;
 
-	//create grid of pathnodes
 	std::vector<PathNode*> m_pGrid;
+	std::vector<Obstacle*> m_pObstacles;	
 
 	void m_buildGrid();
 	void m_toggleGrid(bool state);
-	void m_checkShipLOS(DisplayObject* target_object) const;
-	void m_storeObstacles();
-	void m_clearNodes();
+	bool m_checkAgentLOS(Agent* agent, DisplayObject* target_object);
+	bool m_checkPathNodeLOS(PathNode* path_nade, DisplayObject* target_object);
+	void m_checkAllNodesWithTarget(DisplayObject* target_object);
+	void m_checkAllNodesWithBoth();
+	void m_setPathNodeLOSDistance(int dist);
+	int m_LOSMode;
 
-	static int m_obstacleBuffer;
+	
+	void m_clearNodes();
+	void m_createObstaclesFromFile();
+
+	int m_obstacleBuffer;
+	int m_pathNodeLOSDistance;
 
 };
 
