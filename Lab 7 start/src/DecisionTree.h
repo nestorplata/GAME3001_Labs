@@ -44,7 +44,7 @@ private:
 
 	std::vector<TreeNode*> m_treeNodeList;
 
-	void m_buildTree();
+	//void m_buildTree();
 };
 
 #endif /* defined (__DECISION_TREE__)*/

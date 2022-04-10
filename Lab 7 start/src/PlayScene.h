@@ -58,7 +58,7 @@ private:
 	int m_pathNodeLOSDistance;
 
 	// Decision Tree
-	DecisionTree* m_DecisionTree;
+	//DecisionTree* m_DecisionTree;
 	
 };
 
