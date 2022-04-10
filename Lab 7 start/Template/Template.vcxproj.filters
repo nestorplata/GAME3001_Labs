@@ -186,7 +186,6 @@
     <ClCompile Include="..\src\LOSCondition.cpp">
       <Filter>Decision\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LOSCodition.cpp" />
     <ClCompile Include="..\src\CloseCombatCondition.cpp">
       <Filter>Decision\Conditions</Filter>
     </ClCompile>

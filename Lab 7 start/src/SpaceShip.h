@@ -36,7 +36,7 @@ private:
 	float m_turnRate;
 	float m_accelerationRate;
 	// new for Lab 7
-	std::vector<glm::vec2> m_patrol;
+	std::vector<glm::vec2> m_patrolPath;
 	int m_waypoint;
 
 	// where we want to go
