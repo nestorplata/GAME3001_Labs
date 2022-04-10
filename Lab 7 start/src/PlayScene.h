@@ -8,6 +8,7 @@
 #include "SpaceShip.h"
 #include "PathNode.h"
 #include "Obstacle.h"
+#include "DecisionTree.h"
 // New Lab 7:
 #include "Background.h"
 // #include "DecisionTree.h"
@@ -57,6 +58,7 @@ private:
 	int m_pathNodeLOSDistance;
 
 	// Decision Tree
+	DecisionTree* m_DecisionTree;
 	
 };
 

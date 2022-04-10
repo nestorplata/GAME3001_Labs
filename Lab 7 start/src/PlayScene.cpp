@@ -41,6 +41,8 @@ void PlayScene::update()
 		m_checkAllNodesWithBoth();
 		break;
 	}
+
+	m_DecisionTree->MakeDecision();
 	// Make decision
 
 }
