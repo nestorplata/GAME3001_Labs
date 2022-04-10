@@ -2,7 +2,7 @@
 
 CloseCombatCondition::CloseCombatCondition(bool LOS)
 {
-	m_name = "LOS Condition";
+	m_name = "Close Combat Condition";
 	setIsWithinCombatRange(LOS);
 }
 

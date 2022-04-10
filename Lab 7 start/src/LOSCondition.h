@@ -6,6 +6,8 @@
 
 class LOSCondition : public ConditionNode
 {
+public:
+
 	LOSCondition(bool LOS = false);
 	virtual ~LOSCondition();
 

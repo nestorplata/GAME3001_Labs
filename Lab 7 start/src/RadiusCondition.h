@@ -6,6 +6,8 @@
 
 class RadiusCondition : public ConditionNode
 {
+public:
+
 	RadiusCondition(bool LOS = false);
 	virtual ~RadiusCondition();
 

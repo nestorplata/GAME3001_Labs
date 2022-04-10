@@ -6,6 +6,7 @@
 
 class CloseCombatCondition : public ConditionNode
 {
+public:
 	CloseCombatCondition(bool LOS = false);
 	virtual ~CloseCombatCondition();
 
