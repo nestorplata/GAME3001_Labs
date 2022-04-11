@@ -28,6 +28,18 @@ void PlayScene::update()
 {
 	updateDisplayList();
 
+	m_pSpaceShip->getTree()->getEnemyHealthNode()->setHealth(m_pTarget->getHealth() > 25);
+	m_pSpaceShip->getTree()->getEnemyHitNode()->setIsHit(false); 
+	m_pSpaceShip->checkAgentLOSToTarget(m_pSpaceShip, m_pTarget, m_pObstacles);
+
+	float distance = Util::distance(m_pSpaceShip->getTransform()->position, m_pTarget->getTransform()->position);
+	bool isDetected = distance < 450;
+
+	m_pSpaceShip->getTree()->getPlayerDetectedNode()->setDetected(isDetected);
+
+	bool inRange = distance >= 200 && distance <= 350;
+	m_pSpaceShip->getTree()->getRangedCombatNode()->setIsWithinCombatRange(inRange);
+
 	switch (m_LOSMode)
 	{
 	case 0:
@@ -76,6 +88,24 @@ void PlayScene::handleEvents()
 		addChild(m_pTorpedoes.back(), 2);
 
 	}
+
+	if (EventManager::Instance().keyPressed(SDL_SCANCODE_D))
+	{
+		//torpedo will Fire here
+		m_pTarget->takeDamage(25);
+		std::cout << "Target at: " << m_pTarget->getHealth() << "%." << std::endl;
+
+	}
+
+	if (EventManager::Instance().keyPressed(SDL_SCANCODE_R))
+	{
+		//torpedo will Fire here
+		m_pTarget->setHealth(100);
+		m_pSpaceShip->getTree()->getEnemyHitNode()->setIsHit(false);
+		m_pSpaceShip->getTree()->getPlayerDetectedNode()->setDetected(false);
+		std::cout << "Target Condition has been Reset "<< std::endl;
+
+	}
 }
 
 void PlayScene::start()
@@ -106,8 +136,8 @@ void PlayScene::start()
 	}
 	inFile.close();
 
-	m_pSpaceShip = new CloseCombatEnemy();
-	//m_pSpaceShip = new RangedCombatEnemy();
+	//m_pSpaceShip = new CloseCombatEnemy();
+	m_pSpaceShip = new RangedCombatEnemy();
 	m_pSpaceShip->getTransform()->position = glm::vec2(400.f, 40.f);
 	addChild(m_pSpaceShip, 3);
 

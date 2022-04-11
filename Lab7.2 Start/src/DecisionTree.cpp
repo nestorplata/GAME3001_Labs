@@ -118,10 +118,10 @@ TreeNode* DecisionTree::AddNode(TreeNode* parent, TreeNode* child_node, const Tr
 
 void DecisionTree::Display()
 {
-	for (auto* node : m_treeNodeList)
-	{
-		std::cout << node->m_name << std::endl;
-	}
+	//for (auto* node : m_treeNodeList)
+	//{
+	//	std::cout << node->m_name << std::endl;
+	//}
 }
 
 void DecisionTree::Update()

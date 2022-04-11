@@ -80,7 +80,7 @@ private:
 
 	// LOS
 	float m_LOSDistance;
-	bool m_hasLOS = false;
+	bool m_hasLOS;
 	glm::vec4 m_LOSColour;
 
 	glm::vec2 m_leftLOSEndPoint;
