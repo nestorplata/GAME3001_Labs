@@ -32,8 +32,15 @@ public:
 	void LookWhereYoureGoing(glm::vec2 target_direction);
 
 	// new action functions
+	void Flee() override;
 	void Patrol() override;
 	void MoveToRange() override;
+	void MoveToLOS() override;
+	void WaitBehindCover() override;
+	void MoveToCover() override;
+
+	void Attack() override;
+
 
 	const DecisionTree* getTree() const;
 
