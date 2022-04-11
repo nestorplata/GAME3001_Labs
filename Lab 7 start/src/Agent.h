@@ -8,6 +8,7 @@
 #include "EventManager.h"
 #include "Obstacle.h"
 #include "CollisionManager.h"
+
 class Agent : public NavigationObject
 {
 public:
@@ -54,8 +55,7 @@ public:
 	void setActionState(ActionState a) { m_state = a; }
 
 	//new tree actions
-	virtual void Attack() {}
-	virtual void Attack() {}
+	virtual void Attack() {} 
 	virtual void MoveToLOS() {}
 	virtual void MoveToRange() {}
 	virtual void Patrol() {}

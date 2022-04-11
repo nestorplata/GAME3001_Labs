@@ -11,6 +11,10 @@ PatrolAction::~PatrolAction()
 
 void PatrolAction::Action()
 {
-	std::cout << "Performing " << m_name << std::endl;
-	getAgent()->setActionState(PATROL);
+	if (getAgent()->getActionState() != PATROL)
+	{
+		std::cout << "Performing " << m_name << std::endl;
+
+	}
+	getAgent()->Patrol();
 }

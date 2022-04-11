@@ -1,18 +1,19 @@
-#include "CloseCombatEnemy.h"
+#include "RangedCombatEnemy.h"
 
 #include "Game.h"
 #include "TextureManager.h"
 #include "Util.h"
 #include "AttackAction.h"
 #include "MoveToLOSAction.h"
-#include "MoveToPlayerAction.h"
+
+#include "MoveToRangeAction.h"
 #include "PatrolAction.h"
 
-CloseCombatEnemy::CloseCombatEnemy()
+RangedCombatEnemy::RangedCombatEnemy()
 {
-	TextureManager::Instance().load("../Assets/textures/d7_small.png", "close_enemy");
+	TextureManager::Instance().load("../Assets/textures/reliant_small.png", "ranged_enemy");
 
-	const auto size = TextureManager::Instance().getTextureSize("close_enemy");
+	const auto size = TextureManager::Instance().getTextureSize("ranged_enemy");
 	setWidth(size.x);
 	setHeight(size.y);
 	
@@ -49,75 +50,75 @@ CloseCombatEnemy::CloseCombatEnemy()
 	m_tree->Display();
 }
 
-CloseCombatEnemy::~CloseCombatEnemy() 
+RangedCombatEnemy::~RangedCombatEnemy() 
 = default;
 
-void CloseCombatEnemy::draw()
+void RangedCombatEnemy::draw()
 {
 	// alias for x and y
 	const auto x = getTransform()->position.x;
 	const auto y = getTransform()->position.y;
 
 	// draw the ship
-	TextureManager::Instance().draw("close_enemy", x, y, getCurrentHeading(), 255, isCentered());
+	TextureManager::Instance().draw("ranged_enemy", x, y, getCurrentHeading(), 255, isCentered());
 
 	// draw LOS
 	if (EventManager::Instance().isIMGUIActive()) {
-		Util::DrawLine(getTransform()->position, getMiddleLOSEndPoint(), getLOSColour());
+		Util::DrawLine(getTransform()->position, getTransform()->position + getCurrentDirection() * getLOSDistance(), getLOSColour());
 	}
 }
 
-void CloseCombatEnemy::update()
+void RangedCombatEnemy::update()
 {
 	// Determine which action to perform
 	m_tree->MakeDecision();
 }
 
-void CloseCombatEnemy::clean()
+void RangedCombatEnemy::clean()
 {
 }
 
-float CloseCombatEnemy::getMaxSpeed() const
+float RangedCombatEnemy::getMaxSpeed() const
 {
 	return m_maxSpeed;
 }
 
-float CloseCombatEnemy::getTurnRate() const
+float RangedCombatEnemy::getTurnRate() const
 {
 	return m_turnRate;
 }
 
-float CloseCombatEnemy::getAccelerationRate() const
+float RangedCombatEnemy::getAccelerationRate() const
 {
 	return m_accelerationRate;
 }
 
-glm::vec2 CloseCombatEnemy::getDesiredVelocity() const
+glm::vec2 RangedCombatEnemy::getDesiredVelocity() const
 {
 	return m_desiredVelocity;
 }
 
-void CloseCombatEnemy::setMaxSpeed(const float speed)
+void RangedCombatEnemy::setMaxSpeed(const float speed)
 {
 	m_maxSpeed = speed;
 }
 
-void CloseCombatEnemy::setTurnRate(const float angle)
+void RangedCombatEnemy::setTurnRate(const float angle)
 {
 	m_turnRate = angle;
 }
 
-void CloseCombatEnemy::setAccelerationRate(const float rate)
+void RangedCombatEnemy::setAccelerationRate(const float rate)
 {
 	m_accelerationRate = rate;
 }
 
-void CloseCombatEnemy::setDesiredVelocity(const glm::vec2 target_position)
+void RangedCombatEnemy::setDesiredVelocity(const glm::vec2 target_position)
 {
 	m_desiredVelocity = Util::normalize(target_position - getTransform()->position);
 }
 
-void CloseCombatEnemy::Seek()
+void RangedCombatEnemy::Seek()
 {
 	// Find next waypoint:
 	if (Util::distance(m_patrolPath[m_waypoint], getTransform()->position) < 10)
@@ -138,7 +139,7 @@ void CloseCombatEnemy::Seek()
 	getRigidBody()->acceleration = getCurrentDirection() * getAccelerationRate();
 }
 
-void CloseCombatEnemy::LookWhereYoureGoing(const glm::vec2 target_direction)
+void RangedCombatEnemy::LookWhereYoureGoing(const glm::vec2 target_direction)
 {
 	float target_rotation = Util::signedAngle(getCurrentDirection(), target_direction) - 90;
 
@@ -167,7 +168,7 @@ void CloseCombatEnemy::LookWhereYoureGoing(const glm::vec2 target_direction)
 	updateWhiskers(getWhiskerAngle());
 }
 
-void CloseCombatEnemy::Patrol()
+void RangedCombatEnemy::Patrol()
 {
 	if (getActionState() != PATROL)
 	{
@@ -177,11 +178,11 @@ void CloseCombatEnemy::Patrol()
 	m_move();
 }
 
-void CloseCombatEnemy::MoveToPlayer()
+void RangedCombatEnemy::MoveToRange()
 {
-	if (getActionState() != MOVE_TO_PLAYER)
+	if (getActionState() != MOVE_TO_RANGE)
 	{
-		setActionState(MOVE_TO_PLAYER);
+		setActionState(MOVE_TO_RANGE);
 
 	}
 	//m_move();
@@ -189,12 +190,12 @@ void CloseCombatEnemy::MoveToPlayer()
 
 
 
-const DecisionTree* CloseCombatEnemy::getTree()
+const DecisionTree* RangedCombatEnemy::getTree()
 {
 	return m_tree;
 }
 
-void CloseCombatEnemy::m_move()
+void RangedCombatEnemy::m_move()
 {
 	Seek();
 	
@@ -225,7 +226,7 @@ void CloseCombatEnemy::m_move()
 	getRigidBody()->velocity = Util::clamp(getRigidBody()->velocity, getMaxSpeed());
 }
 
-void CloseCombatEnemy::m_BuildTree()
+void RangedCombatEnemy::m_BuildTree()
 {
 	
 	m_tree->setLOSNode(new LOSCondition()) ;
@@ -235,9 +236,9 @@ void CloseCombatEnemy::m_BuildTree()
 	m_tree->AddNode(m_tree->getLOSNode(), m_tree->getRadiusNode(), LEFT_TREE_NODE);
 	m_tree->getTreee().push_back(m_tree->getRadiusNode());
 
-	m_tree->setCloseCombatNode(new CloseCombatCondition());
-	m_tree->AddNode(m_tree->getLOSNode(), m_tree->getCloseCombatNode(), RIGHT_TREE_NODE);
-	m_tree->getTreee().push_back(m_tree->getCloseCombatNode());
+	m_tree->setRangedCombatNode(new RangeCombatCondition());
+	m_tree->AddNode(m_tree->getLOSNode(), m_tree->getRangedCombatNode(), RIGHT_TREE_NODE);
+	m_tree->getTreee().push_back(m_tree->getRangedCombatNode());
 
 	//Actions
 
@@ -249,11 +250,11 @@ void CloseCombatEnemy::m_BuildTree()
 	dynamic_cast<ActionNode*>(moveToLOSNode)->setAgent(this);
 	m_tree->getTreee().push_back(moveToLOSNode);
 
-	TreeNode* moveToPlayerNOde = m_tree->AddNode(m_tree->getCloseCombatNode(), new MoveToPlayerAction(), LEFT_TREE_NODE);
-	dynamic_cast<ActionNode*>(moveToPlayerNOde)->setAgent(this);
-	m_tree->getTreee().push_back(moveToPlayerNOde);
+	TreeNode* moveToRangeNode = m_tree->AddNode(m_tree->getRangedCombatNode(), new MoveToRangeAction(), LEFT_TREE_NODE);
+	dynamic_cast<ActionNode*>(moveToRangeNode)->setAgent(this);
+	m_tree->getTreee().push_back(moveToRangeNode);
 
-	TreeNode* attackNode = m_tree->AddNode(m_tree->getCloseCombatNode(), new AttackAction(), RIGHT_TREE_NODE);
+	TreeNode* attackNode = m_tree->AddNode(m_tree->getRangedCombatNode(), new AttackAction(), RIGHT_TREE_NODE);
 	dynamic_cast<ActionNode*>(attackNode)->setAgent(this);
 	m_tree->getTreee().push_back(attackNode);
 }

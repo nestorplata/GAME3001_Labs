@@ -11,6 +11,10 @@ MoveToPlayerAction::~MoveToPlayerAction()
 
 void MoveToPlayerAction::Action()
 {
-	std::cout << "Performing " << m_name << std::endl;
-	getAgent()->setActionState(PATROL);
+	if (getAgent()->getActionState() != MOVE_TO_PLAYEr)
+	{
+		std::cout << "Performing " << m_name << std::endl;
+
+	}
+	getAgent()->MoveToPlayer();
 }
