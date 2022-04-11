@@ -5,7 +5,9 @@
 #include <glm/vec4.hpp>
 #include "NavigationObject.h"
 #include "ActionState.h"
-
+#include "EventManager.h"
+#include "Obstacle.h"
+#include "CollisionManager.h"
 class Agent : public NavigationObject
 {
 public:
@@ -50,6 +52,15 @@ public:
 	void updateWhiskers(float a);
 
 	void setActionState(ActionState a) { m_state = a; }
+
+	//new tree actions
+	virtual void Attack() {}
+	virtual void Attack() {}
+	virtual void MoveToLOS() {}
+	virtual void MoveToRange() {}
+	virtual void Patrol() {}
+
+	bool checkAgentLOSToTarget(Agent* agent, DisplayObject *target_object, std::vector<Obstacle*>& obstacles);
 
 private:
 	void m_changeDirection();

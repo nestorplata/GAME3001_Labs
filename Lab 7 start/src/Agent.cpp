@@ -155,6 +155,40 @@ void Agent::updateWhiskers(float a)
 	setRightLOSEndPoint(getTransform()->position + glm::vec2(x, -y) * getLOSDistance() * 0.75f);
 }
 
+bool Agent::checkAgentLOSToTarget(Agent* agent, DisplayObject* target_object, std::vector<Obstacle*>& obstacles)
+{
+	bool hasLOS = false;
+
+	auto targetDirection = target_object->getTransform()->position = agent->getTransform()->position;
+	auto normalizedDirection = Util::normalize(targetDirection);
+	setMiddleLOSEndPoint(getTransform()->position + normalizedDirection * getLOSDistance());
+
+
+	// if ship to target distance is less than or equal to LOS Distance
+	auto AgentToTargetDistance = Util::getClosestEdge(agent->getTransform()->position, target_object);
+	if (AgentToTargetDistance <= agent->getLOSDistance())
+	{
+		std::vector<DisplayObject*> contactList;
+		for (auto obstacle :obstacles)
+		{
+			if (obstacle->getType() == NONE) continue; // Added Lab 7.
+			auto AgentToObjectDistance = Util::getClosestEdge(agent->getTransform()->position, obstacle);
+			if (AgentToObjectDistance > AgentToTargetDistance) continue;
+
+			contactList.push_back(obstacle);
+		}
+
+		hasLOS = CollisionManager::LOSCheck(agent,
+			getMiddleLOSEndPoint(), contactList, target_object);
+		agent->setHasLOS(hasLOS);
+	}
+
+	agent->setHasLOS(hasLOS);
+	return hasLOS;
+
+
+}
+
 void Agent::m_changeDirection()
 {
 	const auto x = cos(m_currentHeading * Util::Deg2Rad);
