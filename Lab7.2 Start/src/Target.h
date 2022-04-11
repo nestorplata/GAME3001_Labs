@@ -4,7 +4,7 @@
 
 #include "Agent.h"
 
-class Target final : public virtual Agent
+class Target final : public Agent
 {
 public:
 	Target();

@@ -10,6 +10,5 @@ LOSCondition::~LOSCondition()
 
 bool LOSCondition::Condition()
 {
-	return false;
-	//return getAgent()->hasLOS();
+	return getAgent()->hasLOS();
 }

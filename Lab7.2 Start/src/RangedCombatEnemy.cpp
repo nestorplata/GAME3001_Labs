@@ -3,15 +3,16 @@
 #include "TextureManager.h"
 #include "Util.h"
 
+// Action includes
 #include "AttackAction.h"
-#include "EventManager.h"
 #include "MoveToLOSAction.h"
 #include "MoveToRangeAction.h"
 #include "PatrolAction.h"
-#include "FleeAction.h"
-#include "WaitBehindCoverAction.h"
-#include "MoveToCoverAction.h"
 
+// New for Lab7c
+#include "FleeAction.h"
+#include "MoveToCoverAction.h"
+#include "WaitBehindCoverAction.h"
 
 RangedCombatEnemy::RangedCombatEnemy()
 {
@@ -178,78 +179,78 @@ void RangedCombatEnemy::LookWhereYoureGoing(const glm::vec2 target_direction)
 void RangedCombatEnemy::Flee()
 {
 	ActionState action = FLEE;
-
-	if (getActionState() != action)
+	if(getActionState() != action)
 	{
-		//Initialize
+		// Initialize
 		setActionState(action);
 	}
-}
-
-void RangedCombatEnemy::Patrol()
-{
-	ActionState action = PATROL;
-
-	if (getActionState() != action)
-	{
-		//Initialize
-		setActionState(action);
-	}
-}
-
-void RangedCombatEnemy::MoveToRange()
-{
-	ActionState action = MOVE_TO_RANGE;
-
-	if (getActionState() != action)
-	{
-		//Initialize
-		setActionState(action);
-	}
+	// action...
 }
 
 void RangedCombatEnemy::MoveToLOS()
 {
 	ActionState action = MOVE_TO_LOS;
-
 	if (getActionState() != action)
 	{
-		//Initialize
+		// Initialize
 		setActionState(action);
 	}
+	// action...
 }
 
 void RangedCombatEnemy::WaitBehindCover()
 {
 	ActionState action = WAIT_BEHIND_COVER;
-
 	if (getActionState() != action)
 	{
-		//Initialize
+		// Initialize
 		setActionState(action);
 	}
+	// action...
 }
 
 void RangedCombatEnemy::MoveToCover()
 {
 	ActionState action = MOVE_TO_COVER;
-
 	if (getActionState() != action)
 	{
-		//Initialize
+		// Initialize
 		setActionState(action);
 	}
+	// action...
 }
 
 void RangedCombatEnemy::Attack()
 {
 	ActionState action = ATTACK;
-
 	if (getActionState() != action)
 	{
-		//Initialize
+		// Initialize
 		setActionState(action);
 	}
+	// action...
+}
+
+void RangedCombatEnemy::Patrol()
+{
+	ActionState action = PATROL;
+	if (getActionState() != action)
+	{
+		// Initialize
+		setActionState(action);
+	}
+	m_move();
+}
+
+void RangedCombatEnemy::MoveToRange()
+{
+	ActionState action = MOVE_TO_RANGE;
+	if (getActionState() != action)
+	{
+		// Initialize
+		setActionState(action);
+	}
+	// action...
 }
 
 const DecisionTree* RangedCombatEnemy::getTree() const
@@ -294,6 +295,7 @@ void RangedCombatEnemy::m_buildTree()
 	m_tree->setEnemyHealthNode(new EnemyHealthCondition());
 	m_tree->getTree().push_back(m_tree->getEnemyHealthNode());
 
+	// add the Flee Action to the Left Subtree
 	TreeNode* fleeNode = m_tree->AddNode(m_tree->getEnemyHealthNode(), new FleeAction(), LEFT_TREE_NODE);
 	fleeNode->setAgent(this);
 	m_tree->getTree().push_back(fleeNode);
@@ -304,7 +306,7 @@ void RangedCombatEnemy::m_buildTree()
 
 	m_tree->setPlayerDetectedNode(new PlayerDetectedCondition());
 	m_tree->AddNode(m_tree->getEnemyHitNode(), m_tree->getPlayerDetectedNode(), LEFT_TREE_NODE);
-	m_tree->getTree().push_back(m_tree->getRadiusNode());
+	m_tree->getTree().push_back(m_tree->getPlayerDetectedNode());
 
 	LOSCondition* losNodeRight = new LOSCondition();
 	m_tree->AddNode(m_tree->getEnemyHitNode(), losNodeRight, RIGHT_TREE_NODE);
@@ -324,9 +326,9 @@ void RangedCombatEnemy::m_buildTree()
 	waitBehindCoverNode->setAgent(this);
 	m_tree->getTree().push_back(waitBehindCoverNode);
 
-	TreeNode* waitToCoverNode = m_tree->AddNode(losNodeRight, new MoveToCoverAction(), RIGHT_TREE_NODE);
-	waitToCoverNode->setAgent(this);
-	m_tree->getTree().push_back(waitToCoverNode);
+	TreeNode* moveToCoverNode = m_tree->AddNode(losNodeRight, new MoveToCoverAction(), RIGHT_TREE_NODE);
+	moveToCoverNode->setAgent(this);
+	m_tree->getTree().push_back(moveToCoverNode);
 
 	TreeNode* moveToLOSNode = m_tree->AddNode(losNodeLeft, new MoveToLOSAction(), LEFT_TREE_NODE);
 	moveToLOSNode->setAgent(this);

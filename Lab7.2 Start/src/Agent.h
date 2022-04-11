@@ -5,11 +5,11 @@
 #include <glm/vec4.hpp>
 #include "NavigationObject.h"
 #include "ActionState.h"
-
+// Added Lab 7b
 #include "EventManager.h"
 #include "Obstacle.h"
 
-class Agent : public NavigationObject
+class Agent : public virtual NavigationObject
 {
 public:
 	Agent();
@@ -17,7 +17,7 @@ public:
 
 	// Inherited via GameObject
 	void draw() override = 0;
-	void update() override = 0;
+	void update() override;
 	void clean() override = 0;
 
 	// getters
@@ -56,6 +56,7 @@ public:
 
 	void setHealth(int value);
 	void takeDamage(int value);
+
 	void setActionState(ActionState a) { m_state = a; }
 
 	// New Tree Actions
@@ -64,7 +65,7 @@ public:
 	virtual void MoveToPlayer() {}
 	virtual void MoveToRange() {}
 	virtual void Patrol() {}
-
+	// New Lab 7c
 	virtual void Flee() {}
 	virtual void WaitBehindCover() {}
 	virtual void MoveToCover() {}
@@ -97,6 +98,7 @@ private:
 	// action state
 	ActionState m_state;
 
+	// New Lab 7c
 	int m_health = 100;
 };
 

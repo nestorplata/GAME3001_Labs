@@ -24,6 +24,25 @@ Agent::Agent()
 Agent::~Agent()
 = default;
 
+void Agent::update()
+{
+}
+
+int Agent::getHealth() const
+{
+	return m_health;
+}
+
+void Agent::setHealth(const int value)
+{
+	m_health = value;
+}
+
+void Agent::takeDamage(const int value)
+{
+	m_health -= value;
+}
+
 glm::vec2 Agent::getTargetPosition() const
 {
 	return m_targetPosition;
@@ -82,11 +101,6 @@ glm::vec4 Agent::getLineColor(int index)
 float Agent::getWhiskerAngle() const
 {
 	return m_whiskerAngle;
-}
-
-int Agent::getHealth() const
-{
-	return m_health;
 }
 
 void Agent::setTargetPosition(const glm::vec2 new_position)
@@ -159,16 +173,6 @@ void Agent::updateWhiskers(float a)
 	x = sin((getCurrentHeading() + m_whiskerAngle + 90) * Util::Deg2Rad);
 	y = cos((getCurrentHeading() + m_whiskerAngle + 90) * Util::Deg2Rad);
 	setRightLOSEndPoint(getTransform()->position + glm::vec2(x, -y) * getLOSDistance() * 0.75f);
-}
-
-void Agent::setHealth(int value)
-{
-	m_health = value;
-}
-
-void Agent::takeDamage(int value)
-{
-	m_health -= value;
 }
 
 bool Agent::checkAgentLOSToTarget(Agent* agent, DisplayObject* target_object, std::vector<Obstacle*>& obstacles)

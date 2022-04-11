@@ -28,18 +28,22 @@ void PlayScene::update()
 {
 	updateDisplayList();
 
+	/*m_pSpaceShip->getTree()->getLOSNode()
+		->setLOS(m_pSpaceShip->checkAgentLOSToTarget(m_pSpaceShip, m_pTarget, m_pObstacles));*/
+
 	m_pSpaceShip->getTree()->getEnemyHealthNode()->setHealth(m_pTarget->getHealth() > 25);
-	m_pSpaceShip->getTree()->getEnemyHitNode()->setIsHit(false); 
+	m_pSpaceShip->getTree()->getEnemyHitNode()->setIsHit(false); // wouldn't be here in A4
 	m_pSpaceShip->checkAgentLOSToTarget(m_pSpaceShip, m_pTarget, m_pObstacles);
 
 	float distance = Util::distance(m_pSpaceShip->getTransform()->position, m_pTarget->getTransform()->position);
-	bool isDetected = distance < 450;
+	bool isDetected = distance < 450; // just outside LOS distance.
 
 	m_pSpaceShip->getTree()->getPlayerDetectedNode()->setDetected(isDetected);
 
-	bool inRange = distance >= 200 && distance <= 350;
+	bool inRange = distance >= 200 && distance <= 350; // Under LOS distance and not too close (optimum firing range)
 	m_pSpaceShip->getTree()->getRangedCombatNode()->setIsWithinCombatRange(inRange);
-
+	
+	// Now for the path_nodes LOS
 	switch (m_LOSMode)
 	{
 	case 0:
@@ -77,35 +81,30 @@ void PlayScene::handleEvents()
 	{
 		TheGame::Instance().changeSceneState(END_SCENE);
 	}
-
-	if (EventManager::Instance().keyPressed(SDL_SCANCODE_F))
+	// New for Lab 7c
+	if(EventManager::Instance().keyPressed(SDL_SCANCODE_F))
 	{
-		//torpedo will Fire here
+		// torpedo will fire here
 		m_pTorpedoes.push_back(new Torpedo(5.0f));
 		m_pTorpedoes.back()->getTransform()->position = m_pTarget->getTransform()->position;
-		SoundManager::Instance().setSoundVolume(30);
 		SoundManager::Instance().playSound("torpedo");
 		addChild(m_pTorpedoes.back(), 2);
-
 	}
 
 	if (EventManager::Instance().keyPressed(SDL_SCANCODE_D))
 	{
-		//torpedo will Fire here
-		m_pTarget->takeDamage(25);
+		m_pTarget->setHealth(m_pTarget->getHealth() - 25); // or call takeDamage(25);
 		std::cout << "Target at: " << m_pTarget->getHealth() << "%." << std::endl;
-
 	}
 
 	if (EventManager::Instance().keyPressed(SDL_SCANCODE_R))
 	{
-		//torpedo will Fire here
 		m_pTarget->setHealth(100);
 		m_pSpaceShip->getTree()->getEnemyHitNode()->setIsHit(false);
 		m_pSpaceShip->getTree()->getPlayerDetectedNode()->setDetected(false);
-		std::cout << "Target Condition has been Reset "<< std::endl;
-
+		std::cout << "Target condition reset." << std::endl;
 	}
+	
 }
 
 void PlayScene::start()
@@ -156,12 +155,10 @@ void PlayScene::start()
 	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "boom", SOUND_SFX);
 	SoundManager::Instance().load("../Assets/audio/torpedo.ogg", "torpedo", SOUND_SFX);
 
-
 	SoundManager::Instance().load("../Assets/audio/mutara.mp3", "mutara", SOUND_MUSIC);
 	SoundManager::Instance().load("../Assets/audio/klingon.mp3", "klingon", SOUND_MUSIC);
-
 	SoundManager::Instance().playMusic("mutara");
-
+	
 	//SoundManager::Instance().playMusic("klingon");
 	SoundManager::Instance().setMusicVolume(16);
 	
