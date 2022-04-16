@@ -7,9 +7,9 @@ TorpedoK::TorpedoK(float speed, glm::vec2 direction)
 	TextureManager::Instance().loadSpriteSheet(
 		"../Assets/sprites/torpedo.txt",
 		"../Assets/sprites/torpedo_k.png", 
-		"torpedoksheet");
+		"torpedok_SpriteSheet");
 
-	setSpriteSheet(TextureManager::Instance().getSpriteSheet("torpedoksheet"));
+	setSpriteSheet(TextureManager::Instance().getSpriteSheet("torpedok_SpriteSheet"));
 	
 	// set frame width
 	setWidth(64);
@@ -22,8 +22,9 @@ TorpedoK::TorpedoK(float speed, glm::vec2 direction)
 	getRigidBody()->acceleration = glm::vec2(0.0f, 0.0f);
 	getRigidBody()->isColliding = false;
 	setType(PROJECTILE);
+	
+	m_direction = { direction.x * speed, direction.y * speed };
 
-	m_direction = glm::vec2(direction.x * speed, direction.y * speed);
 	m_buildAnimations();
 }
 
@@ -40,7 +41,7 @@ void TorpedoK::draw()
 	switch(m_currentAnimationState)
 	{
 	case FIRED:
-		TextureManager::Instance().playAnimation("torpedosheet", getAnimation("fired"),
+		TextureManager::Instance().playAnimation("torpedok_SpriteSheet", getAnimation("fired"),
 			x, y, 5.0f, 0, 255, true);
 		break;
 	default:

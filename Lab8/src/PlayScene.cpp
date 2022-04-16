@@ -154,12 +154,14 @@ void PlayScene::start()
 	SoundManager::Instance().load("../Assets/audio/yay.ogg", "yay", SOUND_SFX);
 	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "boom", SOUND_SFX);
 	SoundManager::Instance().load("../Assets/audio/torpedo.ogg", "torpedo", SOUND_SFX);
+	SoundManager::Instance().load("../Assets/audio/torpedo_k.ogg", "torpedo_k", SOUND_SFX);
+
 
 	SoundManager::Instance().load("../Assets/audio/mutara.mp3", "mutara", SOUND_MUSIC);
 	SoundManager::Instance().load("../Assets/audio/klingon.mp3", "klingon", SOUND_MUSIC);
-	SoundManager::Instance().playMusic("mutara");
+	//SoundManager::Instance().playMusic("mutara");
 	
-	//SoundManager::Instance().playMusic("klingon");
+	SoundManager::Instance().playMusic("klingon");
 	SoundManager::Instance().setMusicVolume(16);
 	
 
@@ -168,6 +170,15 @@ void PlayScene::start()
 
 void PlayScene::SpawnEnemyTorpedo()
 {
+	//Set a Spawn point
+	glm::vec2 spawn_point = m_pSpaceShip->getTransform()->position + m_pSpaceShip->getCurrentDirection() * 30.0f;
+	
+	glm::vec2 torpedo_direction = Util::normalize(m_pTarget->getTransform()->position - spawn_point);
+	// Spawn the torpedo
+	m_pTorpedoesK.push_back(new TorpedoK(5.0f, torpedo_direction));
+	m_pTorpedoesK.back()->getTransform()->position = spawn_point;
+	SoundManager::Instance().playSound("torpedo_k");
+	addChild(m_pTorpedoesK.back(), 1);
 }
 
 void PlayScene::GUI_Function()
@@ -178,7 +189,7 @@ void PlayScene::GUI_Function()
 	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
 	//ImGui::ShowDemoWindow();
 
-	ImGui::Begin("Lab 7 Debug Properties", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
+	ImGui::Begin("Lab 8 Debug Properties", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
 
 	ImGui::Separator();
 

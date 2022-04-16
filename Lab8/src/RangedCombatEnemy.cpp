@@ -17,6 +17,7 @@
 #include "PlayScene.h"
 
 RangedCombatEnemy::RangedCombatEnemy(Scene* scene)
+	:m_fireCounter(0), m_fireCounterMax(60), m_pScene(scene)
 {
 	TextureManager::Instance().load("../Assets/textures/d7_small.png", "ranged_enemy");
 
@@ -224,10 +225,11 @@ void RangedCombatEnemy::MoveToCover()
 
 void RangedCombatEnemy::Attack()
 {
-	ActionState action = ATTACK;
+	const ActionState action = ATTACK;
 	if (getActionState() != action)
 	{
 		// Initialize
+		m_fireCounter = 0;
 		setActionState(action);
 	}
 	// action...
