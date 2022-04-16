@@ -1,14 +1,14 @@
 #include "Torpedo.h"
 #include "TextureManager.h"
 
-Torpedo::Torpedo(float speed): m_currentAnimationState(FIRED),m_speed(speed)
+void Torpedo::CreateTorpedo(float speed, glm::vec2 direction,
+	std::string txtfile, std::string pngfile, std::string name)
 {
-	TextureManager::Instance().loadSpriteSheet(
-		"../Assets/sprites/torpedo.txt",
-		"../Assets/sprites/torpedo.png", 
-		"torpedosheet");
+	m_currentAnimationState=FIRED;
 
-	setSpriteSheet(TextureManager::Instance().getSpriteSheet("torpedosheet"));
+	TextureManager::Instance().loadSpriteSheet(txtfile, pngfile, name);
+
+	setSpriteSheet(TextureManager::Instance().getSpriteSheet(name));
 	
 	// set frame width
 	setWidth(64);
@@ -22,8 +22,14 @@ Torpedo::Torpedo(float speed): m_currentAnimationState(FIRED),m_speed(speed)
 	getRigidBody()->isColliding = false;
 	setType(PROJECTILE);
 
+	m_speed = speed;
+	m_direction = { direction.x * speed, direction.y * speed };
+	m_ShipName = name;
+
 	m_buildAnimations();
 }
+Torpedo::Torpedo() 
+= default;
 
 Torpedo::~Torpedo()
 = default;
@@ -38,7 +44,7 @@ void Torpedo::draw()
 	switch(m_currentAnimationState)
 	{
 	case FIRED:
-		TextureManager::Instance().playAnimation("torpedosheet", getAnimation("fired"),
+		TextureManager::Instance().playAnimation(m_ShipName, getAnimation("fired"),
 			x, y, 5.0f, 0, 255, true);
 		break;
 	default:
@@ -49,7 +55,7 @@ void Torpedo::draw()
 
 void Torpedo::update()
 {
-	this->getTransform()->position.x += m_speed;
+	this->getTransform()->position += m_direction;
 }
 
 void Torpedo::clean(){}

@@ -12,10 +12,12 @@
 #include "Background.h"
 #include "CloseCombatEnemy.h"
 #include "RangedCombatEnemy.h"
-#include "Torpedo.h"
+
 
 //new for lab 8
 #include "TorpedoK.h"
+#include "TorpedoF.h"
+
 
 class PlayScene : public Scene
 {
@@ -49,10 +51,8 @@ private:
 	CloseCombatEnemy* m_pSpaceShip2;
 
 
-	std::vector<Torpedo*> m_pTorpedoes;
-
 	//new for lab 8
-	std::vector<TorpedoK*> m_pTorpedoesK;  //TODO: This needs to go
+	std::vector<Torpedo*> m_pTorpedoes;  //TODO: This needs to go
 
 	std::vector<Obstacle*> m_pObstacles;
 

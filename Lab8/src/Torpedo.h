@@ -5,10 +5,10 @@
 #include "TorpedoAnimationState.h"
 #include "Sprite.h"
 
-class Torpedo final : public virtual Sprite
+class Torpedo : public Sprite
 {
 public:
-	Torpedo(float speed = 0.0f);
+	Torpedo();
 	~Torpedo();
 
 	// Life Cycle Methods
@@ -16,6 +16,8 @@ public:
 	virtual void update() override;
 	virtual void clean() override;
 
+	void CreateTorpedo(float speed, glm::vec2 direction,
+		std::string txtfile, std::string pngfile, std::string name);
 	// setters
 	void setAnimationState(TorpedoAnimationState new_state);
 
@@ -25,6 +27,8 @@ private:
 	TorpedoAnimationState m_currentAnimationState;
 
 	float m_speed;
+	glm::vec2 m_direction;
+	std::string m_ShipName;
 };
 
 #endif /* defined (__TORPEDO__) */
