@@ -84,9 +84,13 @@ void PlayScene::handleEvents()
 	// New for Lab 7c
 	if(EventManager::Instance().keyPressed(SDL_SCANCODE_F))
 	{
+		glm::vec2 spawn_point = m_pSpaceShip->getTransform()->position + m_pSpaceShip->getCurrentDirection() * 30.0f;
+		glm::vec2 torpedo_direction = Util::normalize(m_pTarget->getTransform()->position - spawn_point);
+
 		// torpedo will fire here
-		m_pTorpedoes.push_back(new TorpedoF(5.0f));
-		m_pTorpedoes.back()->getTransform()->position = m_pTarget->getTransform()->position;
+		m_pTorpedoes.push_back(new TorpedoF(5.0f, torpedo_direction));
+
+		m_pTorpedoes.back()->getTransform()->position = m_pSpaceShip->getTransform()->position;
 		SoundManager::Instance().playSound("torpedo");
 		addChild(m_pTorpedoes.back(), 2);
 	}
