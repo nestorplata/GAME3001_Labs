@@ -136,7 +136,7 @@ void PlayScene::start()
 	inFile.close();
 
 	//m_pSpaceShip = new CloseCombatEnemy();
-	m_pSpaceShip = new RangedCombatEnemy();
+	m_pSpaceShip = new RangedCombatEnemy(this);
 	m_pSpaceShip->getTransform()->position = glm::vec2(400.f, 40.f);
 	addChild(m_pSpaceShip, 3);
 
@@ -164,6 +164,10 @@ void PlayScene::start()
 	
 
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
+}
+
+void PlayScene::SpawnEnemyTorpedo()
+{
 }
 
 void PlayScene::GUI_Function()

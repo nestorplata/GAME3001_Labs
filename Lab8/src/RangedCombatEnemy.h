@@ -5,10 +5,12 @@
 #include "Agent.h"
 #include "DecisionTree.h"
 
+#include "Scene.h"
+
 class RangedCombatEnemy final : public virtual Agent
 {
 public:
-	RangedCombatEnemy();
+	RangedCombatEnemy(Scene* scene);
 	~RangedCombatEnemy();
 
 	// Inherited via GameObject
@@ -60,6 +62,12 @@ private:
 	// Decision Tree
 	DecisionTree* m_tree;
 	void m_buildTree();
+
+	// new for lab8
+
+	int m_fireCounter;
+	int m_fireCounterMax;
+	Scene* m_pScene; // store scene pointer
 };
 
 

@@ -14,9 +14,11 @@
 #include "MoveToCoverAction.h"
 #include "WaitBehindCoverAction.h"
 
-RangedCombatEnemy::RangedCombatEnemy()
+#include "PlayScene.h"
+
+RangedCombatEnemy::RangedCombatEnemy(Scene* scene)
 {
-	TextureManager::Instance().load("../Assets/textures/reliant_small.png", "ranged_enemy");
+	TextureManager::Instance().load("../Assets/textures/d7_small.png", "ranged_enemy");
 
 	const auto size = TextureManager::Instance().getTextureSize("ranged_enemy");
 	setWidth(size.x);
@@ -229,6 +231,10 @@ void RangedCombatEnemy::Attack()
 		setActionState(action);
 	}
 	// action...
+	if (m_fireCounter++ % m_fireCounterMax == 0)
+	{
+		dynamic_cast<PlayScene*>(m_pScene)->SpawnEnemyTorpedo();
+	}
 }
 
 void RangedCombatEnemy::Patrol()
