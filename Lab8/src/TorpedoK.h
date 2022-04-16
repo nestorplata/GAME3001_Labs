@@ -1,15 +1,15 @@
 #pragma once
-#ifndef __TORPEDO__
-#define __TORPEDO__
+#ifndef __TORPEDOK__
+#define __TORPEDOK__
 
 #include "TorpedoAnimationState.h"
 #include "Sprite.h"
 
-class Torpedo final : public virtual Sprite
+class TorpedoK final : public virtual Sprite
 {
 public:
-	Torpedo(float speed = 0.0f);
-	~Torpedo();
+	TorpedoK(float speed = 0.0f, glm::vec2 direction = { 0,0 });
+	~TorpedoK();
 
 	// Life Cycle Methods
 	virtual void draw() override;
@@ -24,7 +24,7 @@ private:
 
 	TorpedoAnimationState m_currentAnimationState;
 
-	float m_speed;
+	glm::vec2 m_direction;
 };
 
-#endif /* defined (__TORPEDO__) */
+#endif /* defined (__TORPEDOK__) */
