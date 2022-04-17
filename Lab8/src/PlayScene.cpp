@@ -40,13 +40,16 @@ void PlayScene::update()
 	m_pSpaceShip->getTree()->getPlayerDetectedNode()->setDetected(isDetected);
 	m_pSpaceShip->getTree()->getPlayerDetectedNode()->Condition();
 
-	//Ranged
+	//
 	bool inRange = distance >= 200 && distance <= 350; // Under LOS distance and not too close (optimum firing range)
-	m_pSpaceShip->getTree()->getRangedCombatNode()->setIsWithinCombatRange(inRange);
-
+	bool inCloseRange = distance >= 0 && distance <= 100; // Under LOS distance and close (optimum Attack range)
 	//Close
-	//bool inCloseRange = distance >= 0 && distance <= 100; // Under LOS distance and close (optimum Attack range)
-	//m_pSpaceShip->getTree()->getRangedCombatNode()->setIsWithinCombatRange(inCloseRange);
+	m_pSpaceShip->getTree()->getRangedCombatNode()->setIsWithinCombatRange(inCloseRange);
+
+	//Range
+	//m_pSpaceShip->getTree()->getRangedCombatNode()->setIsWithinCombatRange(inRange);
+
+
 
 
 	// Now for the path_nodes LOS
@@ -145,8 +148,8 @@ void PlayScene::start()
 	}
 	inFile.close();
 
-	//m_pSpaceShip = new CloseCombatEnemy(this); //Close
-	m_pSpaceShip = new RangedCombatEnemy(this);
+	m_pSpaceShip = new CloseCombatEnemy(this); //Close
+	//m_pSpaceShip = new RangedCombatEnemy(this);
 	m_pSpaceShip->getTransform()->position = glm::vec2(400.f, 40.f);
 	addChild(m_pSpaceShip, 3);
 

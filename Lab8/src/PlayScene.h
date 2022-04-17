@@ -50,9 +50,7 @@ private:
 	// Game Objects
 	Background* m_pBG;
 	Target* m_pTarget;
-	RangedCombatEnemy* m_pSpaceShip; //Ranged
-	//CloseCombatEnemy* m_pSpaceShip; //Close
-
+	RangedCombatEnemy* m_pSpaceShip;
 
 	//new for lab 8
 	std::vector<Torpedo*> m_pTorpedoes; 
