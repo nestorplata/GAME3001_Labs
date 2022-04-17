@@ -7,9 +7,10 @@
 
 #include "Scene.h"
 
-class RangedCombatEnemy final : public virtual Agent
+class RangedCombatEnemy  : public virtual Agent
 {
 public:
+	RangedCombatEnemy() = default;
 	RangedCombatEnemy(Scene* scene);
 	~RangedCombatEnemy();
 
@@ -44,7 +45,7 @@ public:
 
 	const DecisionTree* getTree() const;
 
-private:
+protected:
 	// private movement variables
 	float m_maxSpeed;
 	float m_turnRate;

@@ -33,6 +33,9 @@ public:
 	virtual void start() override;
 
 	void SpawnEnemyTorpedo();
+	void SpawnEnemyAttack();
+	void MoveToTarget();
+
 
 private:
 	// IMGUI Function
@@ -47,12 +50,12 @@ private:
 	// Game Objects
 	Background* m_pBG;
 	Target* m_pTarget;
-	RangedCombatEnemy* m_pSpaceShip;
-	//CloseCombatEnemy* m_pSpaceShip;
+	RangedCombatEnemy* m_pSpaceShip; //Ranged
+	//CloseCombatEnemy* m_pSpaceShip; //Close
 
 
 	//new for lab 8
-	std::vector<Torpedo*> m_pTorpedoes;  //TODO: This needs to go
+	std::vector<Torpedo*> m_pTorpedoes; 
 
 	std::vector<Obstacle*> m_pObstacles;
 

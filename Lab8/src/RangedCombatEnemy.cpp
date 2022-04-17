@@ -258,7 +258,7 @@ void RangedCombatEnemy::MoveToRange()
 		// Initialize
 		setActionState(action);
 	}
-	// action...
+	dynamic_cast<PlayScene*>(m_pScene)->MoveToTarget();
 }
 
 const DecisionTree* RangedCombatEnemy::getTree() const

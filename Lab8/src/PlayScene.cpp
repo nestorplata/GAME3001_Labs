@@ -28,21 +28,27 @@ void PlayScene::update()
 {
 	updateDisplayList();
 
-	/*m_pSpaceShip->getTree()->getLOSNode()
-		->setLOS(m_pSpaceShip->checkAgentLOSToTarget(m_pSpaceShip, m_pTarget, m_pObstacles));*/
 
 	m_pSpaceShip->getTree()->getEnemyHealthNode()->setHealth(m_pTarget->getHealth() > 25);
 	m_pSpaceShip->getTree()->getEnemyHitNode()->setIsHit(false); // wouldn't be here in A4
 	m_pSpaceShip->checkAgentLOSToTarget(m_pSpaceShip, m_pTarget, m_pObstacles);
-
+	
+	
 	float distance = Util::distance(m_pSpaceShip->getTransform()->position, m_pTarget->getTransform()->position);
-	bool isDetected = distance < 450; // just outside LOS distance.
+	bool isDetected = distance < 450 && m_pSpaceShip->hasLOS(); // just outside LOS distance.
 
 	m_pSpaceShip->getTree()->getPlayerDetectedNode()->setDetected(isDetected);
+	m_pSpaceShip->getTree()->getPlayerDetectedNode()->Condition();
 
+	//Ranged
 	bool inRange = distance >= 200 && distance <= 350; // Under LOS distance and not too close (optimum firing range)
 	m_pSpaceShip->getTree()->getRangedCombatNode()->setIsWithinCombatRange(inRange);
-	
+
+	//Close
+	//bool inCloseRange = distance >= 0 && distance <= 100; // Under LOS distance and close (optimum Attack range)
+	//m_pSpaceShip->getTree()->getRangedCombatNode()->setIsWithinCombatRange(inCloseRange);
+
+
 	// Now for the path_nodes LOS
 	switch (m_LOSMode)
 	{
@@ -84,13 +90,13 @@ void PlayScene::handleEvents()
 	// New for Lab 7c
 	if(EventManager::Instance().keyPressed(SDL_SCANCODE_F))
 	{
-		glm::vec2 spawn_point = m_pSpaceShip->getTransform()->position + m_pSpaceShip->getCurrentDirection() * 30.0f;
-		glm::vec2 torpedo_direction = Util::normalize(m_pTarget->getTransform()->position - spawn_point);
+		glm::vec2 spawn_point = m_pTarget->getTransform()->position + m_pTarget->getCurrentDirection() * 30.0f;
+		glm::vec2 torpedo_direction = Util::normalize(m_pSpaceShip->getTransform()->position - spawn_point);
 
 		// torpedo will fire here
 		m_pTorpedoes.push_back(new TorpedoF(5.0f, torpedo_direction));
 
-		m_pTorpedoes.back()->getTransform()->position = m_pSpaceShip->getTransform()->position;
+		m_pTorpedoes.back()->getTransform()->position = m_pTarget->getTransform()->position;
 		SoundManager::Instance().playSound("torpedo");
 		addChild(m_pTorpedoes.back(), 2);
 	}
@@ -139,7 +145,7 @@ void PlayScene::start()
 	}
 	inFile.close();
 
-	//m_pSpaceShip = new CloseCombatEnemy();
+	//m_pSpaceShip = new CloseCombatEnemy(this); //Close
 	m_pSpaceShip = new RangedCombatEnemy(this);
 	m_pSpaceShip->getTransform()->position = glm::vec2(400.f, 40.f);
 	addChild(m_pSpaceShip, 3);
@@ -187,6 +193,22 @@ void PlayScene::SpawnEnemyTorpedo()
 	m_pTorpedoes.back()->getTransform()->position = spawn_point;
 	SoundManager::Instance().playSound("torpedo_k");
 	addChild(m_pTorpedoes.back(), 1);
+}
+
+void PlayScene::SpawnEnemyAttack()
+{
+	std::cout << "SpaceShip Attacked target" << std::endl;
+}
+
+void PlayScene::MoveToTarget()
+{
+	glm::vec2 velocity =  m_pTarget->getTransform()->position - m_pSpaceShip->getTransform()->position;
+	glm::vec2 HeadinDirection = Util::normalize(m_pSpaceShip->getTransform()->position - m_pTarget->getTransform()->position);
+	float angle = atan(HeadinDirection.y / HeadinDirection.x) * (180 / (22 / 7));
+
+	m_pSpaceShip->getTransform()->position = m_pSpaceShip->getTransform()->position + velocity/100.0f;
+	m_pSpaceShip->setCurrentHeading(angle + 180);
+	
 }
 
 void PlayScene::GUI_Function()

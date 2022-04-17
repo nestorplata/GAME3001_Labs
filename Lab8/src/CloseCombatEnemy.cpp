@@ -7,8 +7,12 @@
 #include "MoveToPlayerAction.h"
 #include "PatrolAction.h"
 
-CloseCombatEnemy::CloseCombatEnemy()
+CloseCombatEnemy::CloseCombatEnemy(Scene* scene)
 {
+	m_fireCounter = 0;
+	m_fireCounterMax = 60;
+	m_pScene = scene;
+
 	TextureManager::Instance().load("../Assets/textures/d7_small.png", "close_enemy");
 
 	const auto size = TextureManager::Instance().getTextureSize("close_enemy");
@@ -78,52 +82,17 @@ void CloseCombatEnemy::clean()
 {
 }
 
-float CloseCombatEnemy::getMaxSpeed() const
-{
-	return m_maxSpeed;
-}
-
-float CloseCombatEnemy::getTurnRate() const
-{
-	return m_turnRate;
-}
-
-float CloseCombatEnemy::getAccelerationRate() const
-{
-	return m_accelerationRate;
-}
-
-glm::vec2 CloseCombatEnemy::getDesiredVelocity() const
-{
-	return m_desiredVelocity;
-}
-
-void CloseCombatEnemy::setMaxSpeed(const float speed)
-{
-	m_maxSpeed = speed;
-}
-
-void CloseCombatEnemy::setTurnRate(const float angle)
-{
-	m_turnRate = angle;
-}
-
-void CloseCombatEnemy::setAccelerationRate(const float rate)
-{
-	m_accelerationRate = rate;
-}
-
-void CloseCombatEnemy::setDesiredVelocity(const glm::vec2 target_position)
-{
-	m_desiredVelocity = Util::normalize(target_position - getTransform()->position);
-}
 
 void CloseCombatEnemy::Seek()
 {
 	// Find next waypoint:
-	if (Util::distance(m_patrol[m_waypoint], getTransform()->position) <= 10)
+	if (Util::distance(m_patrol[m_waypoint], getTransform()->position) < 10)
 	{
-		if (++m_waypoint == m_patrol.size()) m_waypoint = 0;
+		// if moved to last waypoint go back to the start
+		if (++m_waypoint == m_patrol.size())
+		{
+			m_waypoint = 0;
+		}
 		setTargetPosition(m_patrol[m_waypoint]);
 	}
 
@@ -185,65 +154,81 @@ void CloseCombatEnemy::MoveToPlayer()
 	// m_move();
 }
 
-void CloseCombatEnemy::m_move()
+void CloseCombatEnemy::Attack()
 {
-	Seek();
-	
-	//                                   final Position     position term    velocity term     acceleration term
-	// kinematic equation for motion --> Pf            =      Pi     +     Vi*(time)    +   (0.5)*Ai*(time * time)
+	const ActionState action = ATTACK;
 
-	const float dt = TheGame::Instance().getDeltaTime();
-
-	// compute the position term
-	const glm::vec2 initial_position = getTransform()->position;
-
-	// compute the velocity term
-	const glm::vec2 velocity_term = getRigidBody()->velocity * dt;
-
-	// compute the acceleration term
-	const glm::vec2 acceleration_term = getRigidBody()->acceleration * 0.5f;// *dt;
-	
-	
-	// compute the new position
-	glm::vec2 final_position = initial_position + velocity_term + acceleration_term;
-
-	getTransform()->position = final_position;
-
-	// add our acceleration to velocity
-	getRigidBody()->velocity += getRigidBody()->acceleration;
-
-	// clamp our velocity at max speed
-	getRigidBody()->velocity = Util::clamp(getRigidBody()->velocity, getMaxSpeed());
+	if (getActionState() != action)
+	{
+		// Initialize. Like set move target to player.
+		setActionState(action);
+	}
+	if (m_fireCounter++ % m_fireCounterMax == 0)
+	{
+		dynamic_cast<PlayScene*>(m_pScene)->SpawnEnemyAttack();
+	}
+	// m_move();
 }
 
-void CloseCombatEnemy::m_buildTree()
-{
-	// Create and add root node.
-	m_tree->setPlayerDetectedNode(new PlayerDetectedCondition());
-	m_tree->getTree().push_back(m_tree->getPlayerDetectedNode());
-
-	TreeNode* patrolNode = m_tree->AddNode(m_tree->getPlayerDetectedNode(), new PatrolAction(), LEFT_TREE_NODE);
-	patrolNode->setAgent(this);
-	m_tree->getTree().push_back(patrolNode);
-
-	LOSCondition* losNode = new LOSCondition();
-	m_tree->AddNode(m_tree->getPlayerDetectedNode(), losNode, RIGHT_TREE_NODE);
-	losNode->setAgent(this);
-	m_tree->getTree().push_back(losNode);
-	
-	TreeNode* moveToLOSNode = m_tree->AddNode(losNode, new MoveToLOSAction(), LEFT_TREE_NODE);
-	moveToLOSNode->setAgent(this);
-	m_tree->getTree().push_back(moveToLOSNode);
-
-	m_tree->setCloseCombatNode(new CloseCombatCondition());
-	m_tree->AddNode(losNode, m_tree->getCloseCombatNode(), RIGHT_TREE_NODE);
-	m_tree->getTree().push_back(m_tree->getCloseCombatNode());
-
-	TreeNode* moveToPlayerNode = m_tree->AddNode(m_tree->getCloseCombatNode(), new MoveToPlayerAction(), LEFT_TREE_NODE);
-	moveToPlayerNode->setAgent(this);
-	m_tree->getTree().push_back(moveToPlayerNode);
-
-	TreeNode* attackNode = m_tree->AddNode(m_tree->getCloseCombatNode(), new AttackAction(), RIGHT_TREE_NODE);
-	attackNode->setAgent(this);
-	m_tree->getTree().push_back(attackNode);
-}
+//void CloseCombatEnemy::m_move()
+//{
+//	Seek();
+//	
+//	                                   final Position     position term    velocity term     acceleration term
+//	 kinematic equation for motion --> Pf            =      Pi     +     Vi*(time)    +   (0.5)*Ai*(time * time)
+//
+//	const float dt = TheGame::Instance().getDeltaTime();
+//
+//	 compute the position term
+//	const glm::vec2 initial_position = getTransform()->position;
+//
+//	 compute the velocity term
+//	const glm::vec2 velocity_term = getRigidBody()->velocity * dt;
+//
+//	 compute the acceleration term
+//	const glm::vec2 acceleration_term = getRigidBody()->acceleration * 0.5f;// *dt;
+//	
+//	
+//	 compute the new position
+//	glm::vec2 final_position = initial_position + velocity_term + acceleration_term;
+//
+//	getTransform()->position = final_position;
+//
+//	 add our acceleration to velocity
+//	getRigidBody()->velocity += getRigidBody()->acceleration;
+//
+//	 clamp our velocity at max speed
+//	getRigidBody()->velocity = Util::clamp(getRigidBody()->velocity, getMaxSpeed());
+//}
+//
+//void CloseCombatEnemy::m_buildTree()
+//{
+//	 Create and add root node.
+//	m_tree->setPlayerDetectedNode(new PlayerDetectedCondition());
+//	m_tree->getTree().push_back(m_tree->getPlayerDetectedNode());
+//
+//	TreeNode* patrolNode = m_tree->AddNode(m_tree->getPlayerDetectedNode(), new PatrolAction(), LEFT_TREE_NODE);
+//	patrolNode->setAgent(this);
+//	m_tree->getTree().push_back(patrolNode);
+//
+//	LOSCondition* losNode = new LOSCondition();
+//	m_tree->AddNode(m_tree->getPlayerDetectedNode(), losNode, RIGHT_TREE_NODE);
+//	losNode->setAgent(this);
+//	m_tree->getTree().push_back(losNode);
+//	
+//	TreeNode* moveToLOSNode = m_tree->AddNode(losNode, new MoveToLOSAction(), LEFT_TREE_NODE);
+//	moveToLOSNode->setAgent(this);
+//	m_tree->getTree().push_back(moveToLOSNode);
+//
+//	m_tree->setCloseCombatNode(new CloseCombatCondition());
+//	m_tree->AddNode(losNode, m_tree->getCloseCombatNode(), RIGHT_TREE_NODE);
+//	m_tree->getTree().push_back(m_tree->getCloseCombatNode());
+//
+//	TreeNode* moveToPlayerNode = m_tree->AddNode(m_tree->getCloseCombatNode(), new MoveToPlayerAction(), LEFT_TREE_NODE);
+//	moveToPlayerNode->setAgent(this);
+//	m_tree->getTree().push_back(moveToPlayerNode);
+//
+//	TreeNode* attackNode = m_tree->AddNode(m_tree->getCloseCombatNode(), new AttackAction(), RIGHT_TREE_NODE);
+//	attackNode->setAgent(this);
+//	m_tree->getTree().push_back(attackNode);
+//}
