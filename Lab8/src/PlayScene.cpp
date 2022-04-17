@@ -178,6 +178,10 @@ void PlayScene::SpawnEnemyTorpedo()
 	glm::vec2 spawn_point = m_pSpaceShip->getTransform()->position + m_pSpaceShip->getCurrentDirection() * 30.0f;
 	
 	glm::vec2 torpedo_direction = Util::normalize(m_pTarget->getTransform()->position - spawn_point);
+	//set ship direction
+	float angle = atan(torpedo_direction.y / torpedo_direction.x) * (180 / (22 / 7));
+	std::cout << angle << std::endl;
+	m_pSpaceShip->setCurrentHeading(angle+180);
 	// Spawn the torpedo
 	m_pTorpedoes.push_back(new TorpedoK(5.0f, torpedo_direction));
 	m_pTorpedoes.back()->getTransform()->position = spawn_point;

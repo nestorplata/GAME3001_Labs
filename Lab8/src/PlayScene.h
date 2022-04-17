@@ -48,7 +48,7 @@ private:
 	Background* m_pBG;
 	Target* m_pTarget;
 	RangedCombatEnemy* m_pSpaceShip;
-	CloseCombatEnemy* m_pSpaceShip2;
+	//CloseCombatEnemy* m_pSpaceShip;
 
 
 	//new for lab 8
